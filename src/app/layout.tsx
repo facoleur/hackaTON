@@ -5,13 +5,18 @@ import { getLocale } from 'next-intl/server';
 import { Root } from '@/components/Root/Root';
 import { I18nProvider } from '@/core/i18n/provider';
 
-import '@telegram-apps/telegram-ui/dist/styles.css';
 import 'normalize.css/normalize.css';
 import './_assets/globals.css';
 
 export const metadata: Metadata = {
   title: 'Massage Booking',
   description: 'Book massage sessions on Telegram',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default async function RootLayout({ children }: PropsWithChildren) {

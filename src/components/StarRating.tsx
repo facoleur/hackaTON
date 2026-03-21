@@ -11,7 +11,7 @@ interface StarRatingProps {
 
 export function StarRating({ value, onChange, readonly, size = 28 }: StarRatingProps) {
   return (
-    <div style={{ display: 'flex', gap: 4 }}>
+    <div className="flex gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
@@ -21,20 +21,14 @@ export function StarRating({ value, onChange, readonly, size = 28 }: StarRatingP
             try { hapticFeedback.impactOccurred('light'); } catch {}
             onChange(star);
           }}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: readonly ? 'default' : 'pointer',
-            padding: 0,
-            fontSize: size,
-            lineHeight: 1,
-            color: star <= value ? 'var(--tg-theme-button-color, #2481cc)' : 'var(--tg-theme-hint-color, #999)',
-            minWidth: 44,
-            minHeight: 44,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+          className={[
+            'bg-transparent border-none p-0 leading-none min-w-[44px] min-h-[44px] flex items-center justify-center',
+            readonly ? 'cursor-default' : 'cursor-pointer',
+            star <= value
+              ? 'text-[color:var(--tg-theme-button-color,#2481cc)]'
+              : 'text-[color:var(--tg-theme-hint-color,#999)]',
+          ].join(' ')}
+          style={{ fontSize: size }}
         >
           {star <= value ? '★' : '☆'}
         </button>

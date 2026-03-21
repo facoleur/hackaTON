@@ -1,16 +1,9 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import {
-  List,
-  Section,
-  Cell,
-  Spinner,
-  Placeholder,
-} from '@telegram-apps/telegram-ui';
-import { useClientBookings } from '@/hooks/useBookings';
-import { BookingStatusBadge } from '@/components/BookingStatusBadge';
-import { formatTon } from '@/lib/ton';
+import { BookingStatusBadge } from "@/components/BookingStatusBadge";
+import { useClientBookings } from "@/hooks/useBookings";
+import { formatTon } from "@/lib/ton";
+import { useRouter } from "next/navigation";
 
 export default function BookingsPage() {
   const router = useRouter();
@@ -18,70 +11,96 @@ export default function BookingsPage() {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
-        <Spinner size="l" />
+      <div className="flex justify-center p-10">
+        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!bookings?.length) {
     return (
-      <Placeholder
-        header="No bookings yet"
-        description="Browse therapists to book your first session."
-      />
+      <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+        <p className="font-medium text-foreground">No bookings yet</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Browse therapists to book your first session.
+        </p>
+      </div>
     );
   }
 
   const active = bookings.filter(
-    (b) => !['fully_paid', 'rejected', 'cancelled'].includes(b.status)
+    (b) => !["fully_paid", "rejected", "cancelled"].includes(b.status)
   );
   const past = bookings.filter((b) =>
-    ['fully_paid', 'rejected', 'cancelled'].includes(b.status)
+    ["fully_paid", "rejected", "cancelled"].includes(b.status)
   );
 
   return (
-    <List>
+    <div className="space-y-4 py-4">
       {active.length > 0 && (
-        <Section header="Active">
-          {active.map((booking) => (
-            <Cell
-              key={booking.id}
-              subtitle={
-                <div style={{ marginTop: 4 }}>
-                  <div>{booking.booking_date} · {booking.start_time}</div>
-                  <div style={{ marginTop: 2 }}>
+        <div>
+          <p className="px-4 text-xs font-medium text-muted-foreground   tracking-wide mb-1">
+            Active
+          </p>
+          <div className="bg-card rounded-xl overflow-hidden divide-y divide-border mx-4">
+            {active.map((booking) => (
+              <button
+                key={booking.id}
+                className="flex items-center justify-between w-full px-4 py-3 bg-card hover:bg-accent text-left cursor-pointer border-none"
+                onClick={() => router.push(`/client/pay/${booking.id}`)}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">
+                    {booking.therapist_profiles?.display_name ?? "Therapist"}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {booking.booking_date} · {booking.start_time}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
                     Total: {formatTon(booking.amount_ton)}
-                  </div>
+                  </p>
                 </div>
-              }
-              after={<BookingStatusBadge status={booking.status} />}
-              onClick={() => router.push(`/client/pay/${booking.id}`)}
-            >
-              {booking.therapist_profiles?.display_name ?? 'Therapist'}
-            </Cell>
-          ))}
-        </Section>
+                <div className="ml-3 shrink-0">
+                  <BookingStatusBadge status={booking.status} />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
       {past.length > 0 && (
-        <Section header="Past">
-          {past.map((booking) => (
-            <Cell
-              key={booking.id}
-              subtitle={`${booking.booking_date} · ${booking.start_time}`}
-              after={<BookingStatusBadge status={booking.status} />}
-              onClick={() =>
-                booking.status === 'completed'
-                  ? router.push(`/client/pay/${booking.id}`)
-                  : undefined
-              }
-            >
-              {booking.therapist_profiles?.display_name ?? 'Therapist'}
-            </Cell>
-          ))}
-        </Section>
+        <div>
+          <p className="px-4 text-xs font-medium text-muted-foreground   tracking-wide mb-1">
+            Past
+          </p>
+          <div className="bg-card rounded-xl overflow-hidden divide-y divide-border mx-4">
+            {past.map((booking) => (
+              <button
+                key={booking.id}
+                className="flex items-center justify-between w-full px-4 py-3 bg-card hover:bg-accent text-left cursor-pointer border-none"
+                onClick={() =>
+                  booking.status === "completed"
+                    ? router.push(`/client/pay/${booking.id}`)
+                    : undefined
+                }
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">
+                    {booking.therapist_profiles?.display_name ?? "Therapist"}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {booking.booking_date} · {booking.start_time}
+                  </p>
+                </div>
+                <div className="ml-3 shrink-0">
+                  <BookingStatusBadge status={booking.status} />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
-    </List>
+    </div>
   );
 }

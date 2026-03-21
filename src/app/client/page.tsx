@@ -1,17 +1,8 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import {
-  List,
-  Cell,
-  Section,
-  Avatar,
-  Spinner,
-  Placeholder,
-} from '@telegram-apps/telegram-ui';
-import { useTherapists } from '@/hooks/useTherapists';
-import { StarRating } from '@/components/StarRating';
-import { formatTon } from '@/lib/ton';
+import { TherapistCard } from "@/components/TherapistCard";
+import { useTherapists } from "@/hooks/useTherapists";
+import { useRouter } from "next/navigation";
 
 export default function BrowsePage() {
   const router = useRouter();
@@ -19,71 +10,43 @@ export default function BrowsePage() {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
-        <Spinner size="l" />
+      <div className="flex justify-center p-10">
+        <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <Placeholder
-        header="Failed to load"
-        description="Could not load therapists. Please try again."
-      />
+      <div className="flex flex-col items-center justify-center px-8 py-16 text-center">
+        <p className="text-foreground font-medium">Failed to load</p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          Could not load therapists. Please try again.
+        </p>
+      </div>
     );
   }
 
   if (!therapists?.length) {
     return (
-      <Placeholder
-        header="No therapists yet"
-        description="Check back soon for available massage therapists."
-      />
+      <div className="flex flex-col items-center justify-center px-8 py-16 text-center">
+        <p className="text-foreground font-medium">No therapists yet</p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          Check back soon for available massage therapists.
+        </p>
+      </div>
     );
   }
 
   return (
-    <List>
-      <Section header="Available Therapists">
-        {therapists.map((t) => (
-          <Cell
-            key={t.id}
-            before={
-              <Avatar
-                size={48}
-                src={t.photos?.[0]}
-                acronym={t.display_name.charAt(0)}
-              />
-            }
-            after={
-              <div style={{ textAlign: 'right', fontSize: 13 }}>
-                <div style={{ fontWeight: 600 }}>{formatTon(t.price_ton)}</div>
-                <div style={{ color: 'var(--tg-theme-hint-color)' }}>
-                  {t.duration_minutes} min
-                </div>
-              </div>
-            }
-            subtitle={
-              <div>
-                {t.location_name && (
-                  <span style={{ color: 'var(--tg-theme-hint-color)', fontSize: 12 }}>
-                    📍 {t.location_name}
-                  </span>
-                )}
-                {t.rating != null && (
-                  <div style={{ marginTop: 2 }}>
-                    <StarRating value={Math.round(t.rating)} readonly size={14} />
-                  </div>
-                )}
-              </div>
-            }
-            onClick={() => router.push(`/client/therapist/${t.id}`)}
-          >
-            {t.display_name}
-          </Cell>
-        ))}
-      </Section>
-    </List>
+    <div className="grid grid-cols-2 gap-3 px-3 py-4">
+      {therapists.map((t) => (
+        <TherapistCard
+          key={t.id}
+          therapist={t}
+          onClick={() => router.push(`/client/therapist/${t.id}`)}
+        />
+      ))}
+    </div>
   );
 }

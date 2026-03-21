@@ -3,7 +3,6 @@
 import { type PropsWithChildren, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TonConnectUIProvider, useTonWallet } from '@tonconnect/ui-react';
-import { AppRoot } from '@telegram-apps/telegram-ui';
 import {
   initData,
   miniApp,
@@ -60,9 +59,17 @@ function WalletSync() {
   return null;
 }
 
-function AppRootInner({ children, role }: PropsWithChildren<{ role: Role }>) {
+function AppInner({ children, role }: PropsWithChildren<{ role: Role }>) {
   const lp = useLaunchParams();
   const isDark = useSignal(miniApp.isDark);
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
 
   useEffect(() => {
     try {
@@ -72,15 +79,15 @@ function AppRootInner({ children, role }: PropsWithChildren<{ role: Role }>) {
     }
   }, []);
 
+  // lp is used to detect platform if needed in the future
+  void lp;
+
   return (
-    <AppRoot
-      appearance={isDark ? 'dark' : 'light'}
-      platform={['macos', 'ios'].includes(lp.tgWebAppPlatform) ? 'ios' : 'base'}
-    >
+    <>
       <AuthInit role={role} />
       <WalletSync />
       {children}
-    </AppRoot>
+    </>
   );
 }
 
@@ -95,10 +102,10 @@ export function Providers({ children, role }: ProvidersProps) {
     <QueryClientProvider client={queryClient}>
       <TonConnectUIProvider manifestUrl="/tonconnect-manifest.json">
         {didMount ? (
-          <AppRootInner role={role}>{children}</AppRootInner>
+          <AppInner role={role}>{children}</AppInner>
         ) : (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
-            Loading...
+          <div className="flex justify-center p-10">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         )}
       </TonConnectUIProvider>

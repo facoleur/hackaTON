@@ -1,13 +1,13 @@
-export type Role = 'client' | 'therapist';
+export type Role = "client" | "therapist";
 
 export type BookingStatus =
-  | 'pending'
-  | 'confirmed'
-  | 'upfront_paid'
-  | 'completed'
-  | 'fully_paid'
-  | 'rejected'
-  | 'cancelled';
+  | "pending"
+  | "confirmed"
+  | "upfront_paid"
+  | "completed"
+  | "fully_paid"
+  | "rejected"
+  | "cancelled";
 
 export interface User {
   id: string;
@@ -34,6 +34,7 @@ export interface TherapistProfile {
   rating: number | null;
   is_active: boolean;
   created_at: string;
+  age: number | null;
 }
 
 export interface Availability {
@@ -41,7 +42,7 @@ export interface Availability {
   therapist_id: string;
   day_of_week: number; // 0-6
   start_time: string; // HH:MM
-  end_time: string;   // HH:MM
+  end_time: string; // HH:MM
 }
 
 export interface Booking {
@@ -49,7 +50,7 @@ export interface Booking {
   client_id: string;
   therapist_id: string;
   booking_date: string; // YYYY-MM-DD
-  start_time: string;   // HH:MM
+  start_time: string; // HH:MM
   duration_minutes: number;
   amount_ton: number;
   upfront_percent: number;
