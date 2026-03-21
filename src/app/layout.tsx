@@ -10,8 +10,8 @@ import 'normalize.css/normalize.css';
 import './_assets/globals.css';
 
 export const metadata: Metadata = {
-  title: 'Your Application Title Goes Here',
-  description: 'Your application description goes here',
+  title: 'Massage Booking',
+  description: 'Book massage sessions on Telegram',
 };
 
 export default async function RootLayout({ children }: PropsWithChildren) {
