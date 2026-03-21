@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getSupabaseClient } from '@/lib/supabase-client';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { queryKeys } from '@/lib/query-keys';
-import type { Booking, CreateBookingInput } from '@/lib/types';
+import { queryKeys } from "@/lib/query-keys";
+import { getSupabaseClient } from "@/lib/supabase-client";
+import type { Booking, CreateBookingInput } from "@/lib/types";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useClientBookings() {
   const token = useAuthStore((s) => s.supabaseToken);
   const userId = useAuthStore((s) => s.telegramUser?.id);
 
   return useQuery({
-    queryKey: queryKeys.bookings.byUser(userId ?? ''),
+    queryKey: queryKeys.bookings.byUser(userId ?? ""),
     queryFn: async () => {
       const supabase = getSupabaseClient(token);
       const { data, error } = await supabase
-        .from('bookings')
-        .select('*, therapist_profiles(*)')
-        .eq('client_id', userId)
-        .order('booking_date', { ascending: false });
+        .from("bookings")
+        .select("*, therapist_profiles(*)")
+        .eq("client_id", userId)
+        .order("booking_date", { ascending: false });
 
       if (error) throw error;
       return data as Booking[];
@@ -35,10 +35,10 @@ export function useTherapistBookings(therapistProfileId: string) {
     queryFn: async () => {
       const supabase = getSupabaseClient(token);
       const { data, error } = await supabase
-        .from('bookings')
-        .select('*, users(*)')
-        .eq('therapist_id', therapistProfileId)
-        .order('booking_date', { ascending: true });
+        .from("bookings")
+        .select("*, users(*)")
+        .eq("therapist_id", therapistProfileId)
+        .order("booking_date", { ascending: true });
 
       if (error) throw error;
       return data as Booking[];
@@ -55,9 +55,9 @@ export function useBooking(bookingId: string) {
     queryFn: async () => {
       const supabase = getSupabaseClient(token);
       const { data, error } = await supabase
-        .from('bookings')
-        .select('*, therapist_profiles(*)')
-        .eq('id', bookingId)
+        .from("bookings")
+        .select("*, therapist_profiles(*)")
+        .eq("id", bookingId)
         .single();
 
       if (error) throw error;
@@ -76,8 +76,8 @@ export function useCreateBooking() {
     mutationFn: async (input: CreateBookingInput) => {
       const supabase = getSupabaseClient(token);
       const { data, error } = await supabase
-        .from('bookings')
-        .insert({ ...input, client_id: userId, status: 'pending' })
+        .from("bookings")
+        .insert({ ...input, client_id: userId, status: "pending" })
         .select()
         .single();
 
@@ -98,9 +98,9 @@ export function useConfirmBooking() {
     mutationFn: async (bookingId: string) => {
       const supabase = getSupabaseClient(token);
       const { error } = await supabase
-        .from('bookings')
-        .update({ status: 'confirmed' })
-        .eq('id', bookingId);
+        .from("bookings")
+        .update({ status: "confirmed" })
+        .eq("id", bookingId);
 
       if (error) throw error;
     },
@@ -118,9 +118,9 @@ export function useRejectBooking() {
     mutationFn: async (bookingId: string) => {
       const supabase = getSupabaseClient(token);
       const { error } = await supabase
-        .from('bookings')
-        .update({ status: 'rejected' })
-        .eq('id', bookingId);
+        .from("bookings")
+        .update({ status: "rejected" })
+        .eq("id", bookingId);
 
       if (error) throw error;
     },
@@ -138,9 +138,9 @@ export function useCompleteBooking() {
     mutationFn: async (bookingId: string) => {
       const supabase = getSupabaseClient(token);
       const { error } = await supabase
-        .from('bookings')
-        .update({ status: 'completed' })
-        .eq('id', bookingId);
+        .from("bookings")
+        .update({ status: "completed" })
+        .eq("id", bookingId);
 
       if (error) throw error;
     },
@@ -158,9 +158,9 @@ export function useCancelBooking() {
     mutationFn: async (bookingId: string) => {
       const supabase = getSupabaseClient(token);
       const { error } = await supabase
-        .from('bookings')
-        .update({ status: 'cancelled' })
-        .eq('id', bookingId);
+        .from("bookings")
+        .update({ status: "cancelled" })
+        .eq("id", bookingId);
 
       if (error) throw error;
     },

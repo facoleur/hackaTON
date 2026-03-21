@@ -373,7 +373,7 @@ export default function TherapistDetailPage({ params }: Props) {
 
                 {/* Pay */}
                 <PayButton
-                  therapistWallet={therapist.user_id}
+                  therapistWallet={therapist.}
                   amountTon={upfrontAmount}
                   label={`Pay ${formatTon(upfrontAmount)} now`}
                   onSuccess={handlePaymentSuccess}

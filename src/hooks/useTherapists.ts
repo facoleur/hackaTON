@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { getSupabaseClient } from '@/lib/supabase-client';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { queryKeys } from '@/lib/query-keys';
-import type { TherapistProfile } from '@/lib/types';
+import { queryKeys } from "@/lib/query-keys";
+import { getSupabaseClient } from "@/lib/supabase-client";
+import type { TherapistProfile } from "@/lib/types";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useQuery } from "@tanstack/react-query";
 
 export function useTherapists() {
   const token = useAuthStore((s) => s.supabaseToken);
@@ -14,10 +14,10 @@ export function useTherapists() {
     queryFn: async () => {
       const supabase = getSupabaseClient(token);
       const { data, error } = await supabase
-        .from('therapist_profiles')
-        .select('*')
-        .eq('is_active', true)
-        .order('rating', { ascending: false });
+        .from("therapist_profiles")
+        .select("*")
+        .eq("is_active", true)
+        .order("rating", { ascending: false });
 
       if (error) throw error;
       return data as TherapistProfile[];
@@ -34,9 +34,9 @@ export function useTherapist(id: string) {
     queryFn: async () => {
       const supabase = getSupabaseClient(token);
       const { data, error } = await supabase
-        .from('therapist_profiles')
-        .select('*')
-        .eq('id', id)
+        .from("therapist_profiles")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (error) throw error;
