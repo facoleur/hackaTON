@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
 @theme inline {
+  --spacing-safe-bottom: 2rem !important;
+  --spacing-safe-bottom-2: 5rem !important;
+}
+
+.safe-botton-zone {
+  padding-bottom: var(--spacing-safe-bottom);
+}
+
+.safe-botton-zone-2 {
+  padding-bottom: var(--spacing-safe-bottom-2);
+}
+
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

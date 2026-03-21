@@ -30,12 +30,12 @@ export function ClientShell({ children }: PropsWithChildren) {
   }, [isRoot, router]);
 
   return (
-    <div className="flex flex-col overflow-hidden bg-slate-100">
-      <div className={cn("flex-1 overflow-x-hidden overflow-y-auto", !tabbarHidden && "mb-16")}>
+    <div className="flex flex-col overflow-hidden bg-slate-100 safe-botton-zone-2">
+      <div className={cn("flex-1 overflow-x-hidden overflow-y-auto", !tabbarHidden && "mb-safe-bottom")}>
         {children}
       </div>
       {!tabbarHidden && <nav className="bg-card border-border fixed right-0 bottom-0 left-0 border-t">
-        <div className="flex bg-white">
+        <div className="flex bg-white safe-botton-zone">
           {tabs.map((tab) => {
             const active =
               tab.path === "/client"

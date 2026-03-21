@@ -5,12 +5,12 @@ import { ImageSlider } from "@/components/ImageSlider";
 import { Button } from "@/components/ui/button";
 import { useAvailability } from "@/hooks/useAvailability";
 import { useCreateBooking } from "@/hooks/useBookings";
+import { useSwipeBack } from "@/hooks/useSwipeBack";
 import { useTherapist } from "@/hooks/useTherapists";
 import { formatTon } from "@/lib/ton";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { hapticFeedback } from "@tma.js/sdk-react";
 import { useRouter } from "next/navigation";
-import { useSwipeBack } from "@/hooks/useSwipeBack";
 import { use, useState } from "react";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -93,7 +93,7 @@ export default function TherapistDetailPage({ params }: Props) {
     <>
       <HideTabbar />
       {/* Scrollable page */}
-      <div className="pb-28" {...swipeBack}>
+      <div className="pb-safe-bottom" {...swipeBack}>
         {/* Hero — 70vh swipeable photo */}
         <ImageSlider
           photos={photos}
@@ -235,7 +235,7 @@ export default function TherapistDetailPage({ params }: Props) {
 
       {/* Fixed Book button — sits above bottom nav (nav is ~56px) */}
       {token && (
-        <div className="fixed right-4 bottom-4 z-30">
+        <div className="safe-botton-zone fixed right-4 bottom-4 z-30">
           <Button
             size="lg"
             className="h-12 w-full rounded-2xl px-6 text-base font-semibold shadow-lg"
