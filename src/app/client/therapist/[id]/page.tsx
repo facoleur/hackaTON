@@ -2,9 +2,11 @@
 
 import { HideTabbar } from "@/components/HideTabbar";
 import { ImageSlider } from "@/components/ImageSlider";
+import { PayButton } from "@/components/PayButton";
 import { Button } from "@/components/ui/button";
 import { useAvailability } from "@/hooks/useAvailability";
 import { useCreateBooking } from "@/hooks/useBookings";
+import { usePayUpfront } from "@/hooks/usePayments";
 import { useSwipeBack } from "@/hooks/useSwipeBack";
 import { useTherapist } from "@/hooks/useTherapists";
 import { formatTon } from "@/lib/ton";
@@ -32,6 +34,7 @@ export default function TherapistDetailPage({ params }: Props) {
   const { data: therapist, isLoading } = useTherapist(id);
   const { data: slots } = useAvailability(id);
   const createBooking = useCreateBooking();
+  const payUpfront = usePayUpfront();
   const token = useAuthStore((s) => s.supabaseToken);
 
   const swipeBack = useSwipeBack();
@@ -39,6 +42,8 @@ export default function TherapistDetailPage({ params }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [bookingDate, setBookingDate] = useState("");
+  const [drawerStep, setDrawerStep] = useState<"form" | "success">("form");
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -65,12 +70,9 @@ export default function TherapistDetailPage({ params }: Props) {
 
   const selectedSlot = slots?.find((s) => s.id === selectedSlotId) ?? null;
 
-  async function handleConfirm() {
-    if (!selectedSlot || !bookingDate || !therapist) return;
-    try {
-      hapticFeedback.impactOccurred("medium");
-    } catch {}
-    await createBooking.mutateAsync({
+  async function handlePaymentSuccess(boc: string) {
+    if (!therapist || !selectedSlot || !bookingDate) return;
+    const booking = await createBooking.mutateAsync({
       therapist_id: therapist.id,
       booking_date: bookingDate,
       start_time: selectedSlot.start_time,
@@ -80,14 +82,16 @@ export default function TherapistDetailPage({ params }: Props) {
       upfront_amount: upfrontAmount,
       remaining_amount: remainingAmount,
     });
-    try {
-      hapticFeedback.notificationOccurred("success");
-    } catch {}
-    router.push("/client/bookings");
+    await payUpfront.mutateAsync({
+      bookingId: booking.id,
+      txHash: boc,
+      isFullPayment: therapist.upfront_percent === 100,
+    });
+    setTxHash(boc);
+    setDrawerStep("success");
   }
 
-  const canConfirm =
-    !!selectedSlot && !!bookingDate && !createBooking.isPending;
+  const canPay = !!selectedSlot && !!bookingDate;
 
   return (
     <>
@@ -243,6 +247,8 @@ export default function TherapistDetailPage({ params }: Props) {
               try {
                 hapticFeedback.impactOccurred("light");
               } catch {}
+              setDrawerStep("form");
+              setTxHash(null);
               setDrawerOpen(true);
             }}
           >
@@ -265,79 +271,116 @@ export default function TherapistDetailPage({ params }: Props) {
             {/* Handle */}
             <div className="bg-border mx-auto mb-5 h-1 w-10 rounded-full" />
 
-            <h2 className="text-foreground mb-5 text-lg font-semibold">
-              Book a session
-            </h2>
-
-            {/* Date */}
-            <div className="mb-4">
-              <label className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wider">
-                Date
-              </label>
-              <input
-                type="date"
-                value={bookingDate}
-                onChange={(e) => setBookingDate(e.target.value)}
-                min={new Date().toISOString().split("T")[0]}
-                className="border-border bg-card text-foreground focus:ring-primary/40 w-full appearance-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
-              />
-            </div>
-
-            {/* Time slot */}
-            {slots && slots.length > 0 && (
-              <div className="mb-6">
-                <label className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wider">
-                  Time slot
-                </label>
-                <div className="flex flex-col gap-2">
-                  {slots.map((slot) => {
-                    const active = selectedSlotId === slot.id;
-                    return (
-                      <button
-                        key={slot.id}
-                        onClick={() => {
-                          try {
-                            hapticFeedback.impactOccurred("light");
-                          } catch {}
-                          setSelectedSlotId(slot.id);
-                        }}
-                        className="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors"
-                        style={{
-                          borderColor: active
-                            ? "var(--primary)"
-                            : "var(--border)",
-                          background: active
-                            ? "color-mix(in srgb, var(--primary) 10%, transparent)"
-                            : "var(--card)",
-                          color: active
-                            ? "var(--primary)"
-                            : "var(--foreground)",
-                          fontWeight: active ? 600 : 400,
-                        }}
-                      >
-                        <span>{DAY_NAMES[slot.day_of_week]}</span>
-                        <span>
-                          {slot.start_time} – {slot.end_time}
-                        </span>
-                      </button>
-                    );
-                  })}
+            {drawerStep === "success" ? (
+              /* ── Success state ── */
+              <div className="flex flex-col items-center py-4 pb-2 text-center">
+                <div className="bg-primary/10 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--primary)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                 </div>
+                <h2 className="text-foreground mb-1 text-xl font-bold">
+                  Booking confirmed!
+                </h2>
+                <p className="text-muted-foreground mb-1 text-sm">
+                  {formatTon(upfrontAmount)} sent to {therapist.display_name}
+                </p>
+                {txHash && (
+                  <p className="text-muted-foreground mb-6 max-w-xs text-xs break-all opacity-60">
+                    tx: {txHash.slice(0, 32)}…
+                  </p>
+                )}
+                <Button
+                  size="lg"
+                  className="w-full rounded-2xl"
+                  onClick={() => router.push("/client/bookings")}
+                >
+                  View my bookings
+                </Button>
               </div>
-            )}
+            ) : (
+              /* ── Form state ── */
+              <>
+                <h2 className="text-foreground mb-5 text-lg font-semibold">
+                  Book a session
+                </h2>
 
-            {/* Confirm */}
-            <Button
-              size="lg"
-              className="h-12 w-full rounded-2xl text-base font-semibold"
-              disabled={!canConfirm}
-              loading={createBooking.isPending}
-              onClick={handleConfirm}
-            >
-              {canConfirm
-                ? `Confirm · Pay ${formatTon(upfrontAmount)} now`
-                : "Select date & time slot"}
-            </Button>
+                {/* Date */}
+                <div className="mb-4">
+                  <label className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wider">
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    value={bookingDate}
+                    onChange={(e) => setBookingDate(e.target.value)}
+                    min={new Date().toISOString().split("T")[0]}
+                    className="border-border bg-card text-foreground focus:ring-primary/40 w-full appearance-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                  />
+                </div>
+
+                {/* Time slot */}
+                {slots && slots.length > 0 && (
+                  <div className="mb-6">
+                    <label className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wider">
+                      Time slot
+                    </label>
+                    <div className="flex flex-col gap-2">
+                      {slots.map((slot) => {
+                        const active = selectedSlotId === slot.id;
+                        return (
+                          <button
+                            key={slot.id}
+                            onClick={() => {
+                              try {
+                                hapticFeedback.impactOccurred("light");
+                              } catch {}
+                              setSelectedSlotId(slot.id);
+                            }}
+                            className="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors"
+                            style={{
+                              borderColor: active
+                                ? "var(--primary)"
+                                : "var(--border)",
+                              background: active
+                                ? "color-mix(in srgb, var(--primary) 10%, transparent)"
+                                : "var(--card)",
+                              color: active
+                                ? "var(--primary)"
+                                : "var(--foreground)",
+                              fontWeight: active ? 600 : 400,
+                            }}
+                          >
+                            <span>{DAY_NAMES[slot.day_of_week]}</span>
+                            <span>
+                              {slot.start_time} – {slot.end_time}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pay */}
+                <PayButton
+                  therapistWallet={therapist.user_id}
+                  amountTon={upfrontAmount}
+                  label={`Pay ${formatTon(upfrontAmount)} now`}
+                  onSuccess={handlePaymentSuccess}
+                  disabled={!canPay}
+                />
+              </>
+            )}
           </div>
         </>
       )}
