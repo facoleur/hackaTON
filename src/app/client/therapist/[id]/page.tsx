@@ -261,7 +261,7 @@ export default function TherapistDetailPage({ params }: Props) {
           />
 
           {/* Sheet */}
-          <div className="bg-background fixed right-0 bottom-0 left-0 z-50 rounded-t-3xl px-4 pt-3 pb-8 shadow-2xl">
+          <div className="bg-background fixed right-0 bottom-0 left-0 z-50 rounded-t-3xl px-4 pt-3 pb-12! shadow-2xl">
             {/* Handle */}
             <div className="bg-border mx-auto mb-5 h-1 w-10 rounded-full" />
 

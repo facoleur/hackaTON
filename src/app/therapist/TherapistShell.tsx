@@ -29,11 +29,11 @@ export function TherapistShell({ children }: PropsWithChildren) {
   }, [isRoot, router]);
 
   return (
-    <div className="flex h-[var(--tg-viewport-stable-height,100dvh)] flex-col overflow-hidden">
-      <div className="flex-1 overflow-x-hidden overflow-y-auto pb-[calc(64px+env(safe-area-inset-bottom,0px))]">
+    <div className="flex flex-col overflow-hidden bg-slate-100">
+      <div className="mx-2 flex-1 overflow-x-hidden overflow-y-auto">
         {children}
       </div>
-      <nav className="bg-card border-border fixed right-0 bottom-0 left-0 border-t pb-[env(safe-area-inset-bottom,0px)]">
+      <nav className="bg-card border-border fixed right-0 bottom-0 left-0 border-t">
         <div className="flex">
           {tabs.map((tab) => {
             const active = pathname === tab.path;

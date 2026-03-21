@@ -1,7 +1,7 @@
 "use client";
 
 import type { TherapistProfile } from "@/lib/types";
-import { useRef, useState } from "react";
+import { useImageSlider } from "@/hooks/useImageSlider";
 
 interface TherapistCardProps {
   therapist: TherapistProfile;
@@ -14,57 +14,44 @@ export function TherapistCard({
   reviewCount,
   onClick,
 }: TherapistCardProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const touchStartX = useRef<number | null>(null);
+  const { emblaRef, index: currentIndex, scrollTo } = useImageSlider();
   const photos = therapist.photos?.length ? therapist.photos : [];
   const hasMultiple = photos.length > 1;
 
-  function handleTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX;
-  }
-
-  function handleTouchEnd(e: React.TouchEvent) {
-    if (touchStartX.current === null) return;
-    const delta = e.changedTouches[0].clientX - touchStartX.current;
-    touchStartX.current = null;
-    if (Math.abs(delta) < 40) return;
-    if (delta < 0 && currentIndex < photos.length - 1) {
-      setCurrentIndex((i) => i + 1);
-    } else if (delta > 0 && currentIndex > 0) {
-      setCurrentIndex((i) => i - 1);
-    }
-  }
-
   function handleDotClick(e: React.MouseEvent, idx: number) {
     e.stopPropagation();
-    setCurrentIndex(idx);
+    scrollTo(idx);
   }
-
-  const photo = photos[currentIndex];
 
   return (
     <div
       className="relative w-full rounded-2xl overflow-hidden shadow-lg cursor-pointer select-none"
       style={{ aspectRatio: "3/4" }}
       onClick={onClick}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
     >
-      {/* Background image */}
-      {photo ? (
-        <img
-          src={photo}
-          alt={therapist.display_name}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-          draggable={false}
-        />
-      ) : (
-        <div className="absolute inset-0 bg-muted flex items-center justify-center">
-          <span className="text-6xl font-bold text-muted-foreground/30">
-            {therapist.display_name.charAt(0)}
-          </span>
-        </div>
-      )}
+      {/* Embla viewport */}
+      <div className="absolute inset-0 overflow-hidden" ref={emblaRef}>
+        {photos.length > 0 ? (
+          <div className="flex h-full">
+            {photos.map((src, idx) => (
+              <div key={idx} className="shrink-0 w-full h-full">
+                <img
+                  src={src}
+                  alt={therapist.display_name}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <span className="text-6xl font-bold text-muted-foreground/30">
+              {therapist.display_name.charAt(0)}
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* Dot indicators */}
       {hasMultiple && (

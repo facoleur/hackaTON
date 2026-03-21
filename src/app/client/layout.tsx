@@ -1,11 +1,13 @@
-import type { PropsWithChildren } from 'react';
-import { ClientShell } from './ClientShell';
-import { Providers } from '@/app/providers';
+import { Providers } from "@/app/providers";
+import type { PropsWithChildren } from "react";
+import { ClientShell } from "./ClientShell";
 
 export default function ClientLayout({ children }: PropsWithChildren) {
   return (
     <Providers role="client">
-      <ClientShell>{children}</ClientShell>
+      <ClientShell>
+        <div>{children}</div>
+      </ClientShell>
     </Providers>
   );
 }
