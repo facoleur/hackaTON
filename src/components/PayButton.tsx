@@ -1,10 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@telegram-apps/telegram-ui';
-import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
-import { buildPayTransaction } from '@/lib/ton';
-import { closingBehavior, swipeBehavior, hapticFeedback } from '@tma.js/sdk-react';
+import { buildPayTransaction } from "@/lib/ton";
+import { Button } from "@telegram-apps/telegram-ui";
+import {
+  closingBehavior,
+  hapticFeedback,
+  swipeBehavior,
+} from "@tma.js/sdk-react";
+import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import { useState } from "react";
 
 interface PayButtonProps {
   therapistWallet: string;
@@ -27,7 +31,7 @@ export function PayButton({
 
   async function handlePay() {
     try {
-      hapticFeedback.impactOccurred('medium');
+      hapticFeedback.impactOccurred("medium");
     } catch {}
 
     if (!wallet) {
@@ -37,20 +41,30 @@ export function PayButton({
 
     setLoading(true);
 
-    try { closingBehavior.enableConfirmation(); } catch {}
-    try { swipeBehavior.disableVertical(); } catch {}
+    try {
+      closingBehavior.enableConfirmation();
+    } catch {}
+    try {
+      swipeBehavior.disableVertical();
+    } catch {}
 
     try {
       const tx = buildPayTransaction(therapistWallet, amountTon);
       const result = await tonConnectUI.sendTransaction(tx);
-      try { hapticFeedback.notificationOccurred('success'); } catch {}
+      try {
+        hapticFeedback.notificationOccurred("success");
+      } catch {}
       onSuccess(result.boc);
     } catch (err) {
-      console.error('Payment failed', err);
-      try { hapticFeedback.notificationOccurred('error'); } catch {}
+      console.error("Payment failed", err);
+      try {
+        hapticFeedback.notificationOccurred("error");
+      } catch {}
     } finally {
       setLoading(false);
-      try { closingBehavior.disableConfirmation(); } catch {}
+      try {
+        closingBehavior.disableConfirmation();
+      } catch {}
     }
   }
 
@@ -62,7 +76,7 @@ export function PayButton({
       disabled={disabled || loading}
       onClick={handlePay}
     >
-      {wallet ? label : 'Connect Wallet to Pay'}
+      {wallet ? label : "Connect Wallet to Pay"}
     </Button>
   );
 }

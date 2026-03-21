@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { type PropsWithChildren, useEffect, useRef } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TonConnectUIProvider, useTonWallet } from '@tonconnect/ui-react';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   initData,
   miniApp,
+  swipeBehavior,
   useLaunchParams,
   useSignal,
-  swipeBehavior,
-} from '@tma.js/sdk-react';
+} from "@tma.js/sdk-react";
+import { TonConnectUIProvider, useTonWallet } from "@tonconnect/ui-react";
+import { type PropsWithChildren, useEffect, useRef } from "react";
 
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useDidMount } from '@/hooks/useDidMount';
-import type { Role } from '@/lib/types';
+import { useDidMount } from "@/hooks/useDidMount";
+import type { Role } from "@/lib/types";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,9 +32,9 @@ function AuthInit({ role }: { role: Role }) {
     if (!initDataRaw || initialized.current) return;
     initialized.current = true;
 
-    fetch('/api/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("/api/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ initData: initDataRaw, role }),
     })
       .then((r) => r.json())
@@ -65,9 +65,9 @@ function AppInner({ children, role }: PropsWithChildren<{ role: Role }>) {
 
   useEffect(() => {
     if (isDark) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   }, [isDark]);
 
@@ -100,12 +100,17 @@ export function Providers({ children, role }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TonConnectUIProvider manifestUrl="/tonconnect-manifest.json">
+      <TonConnectUIProvider
+        manifestUrl={`${process.env.NEXT_PUBLIC_APP_URL}/tonconnect-manifest.json`}
+        actionsConfiguration={{
+          twaReturnUrl: `https://t.me/${process.env.NEXT_PUBLIC_BOT_USERNAME}`,
+        }}
+      >
         {didMount ? (
           <AppInner role={role}>{children}</AppInner>
         ) : (
           <div className="flex justify-center p-10">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
           </div>
         )}
       </TonConnectUIProvider>

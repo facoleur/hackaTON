@@ -1,5 +1,6 @@
 "use client";
 
+import { Header } from "@/components/Header";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/useUIStore";
 import { backButton } from "@tma.js/sdk-react";
@@ -31,6 +32,7 @@ export function ClientShell({ children }: PropsWithChildren) {
 
   return (
     <div className="flex flex-col overflow-hidden bg-slate-100 safe-botton-zone-2">
+      <Header />
       <div className={cn("flex-1 overflow-x-hidden overflow-y-auto", !tabbarHidden && "mb-safe-bottom")}>
         {children}
       </div>
