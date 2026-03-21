@@ -1,14 +1,15 @@
 "use client";
 
+import { BookingSuccessCard } from "@/components/BookingSuccessCard";
 import { HideTabbar } from "@/components/HideTabbar";
 import { ImageSlider } from "@/components/ImageSlider";
 import { PayButton } from "@/components/PayButton";
 import { Button } from "@/components/ui/button";
 import { useAvailability } from "@/hooks/useAvailability";
-import { useCreateBooking } from "@/hooks/useBookings";
-import { usePayUpfront } from "@/hooks/usePayments";
+import { useBookAndPay } from "@/hooks/useBookAndPay";
 import { useSwipeBack } from "@/hooks/useSwipeBack";
 import { useTherapist } from "@/hooks/useTherapists";
+import { useTherapistWalletAddress } from "@/hooks/useTherapistWalletAddress";
 import { formatTon } from "@/lib/ton";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { hapticFeedback } from "@tma.js/sdk-react";
@@ -33,8 +34,7 @@ export default function TherapistDetailPage({ params }: Props) {
   const router = useRouter();
   const { data: therapist, isLoading } = useTherapist(id);
   const { data: slots } = useAvailability(id);
-  const createBooking = useCreateBooking();
-  const payUpfront = usePayUpfront();
+  const bookAndPay = useBookAndPay();
   const token = useAuthStore((s) => s.supabaseToken);
 
   const swipeBack = useSwipeBack();
@@ -44,6 +44,10 @@ export default function TherapistDetailPage({ params }: Props) {
   const [bookingDate, setBookingDate] = useState("");
   const [drawerStep, setDrawerStep] = useState<"form" | "success">("form");
   const [txHash, setTxHash] = useState<string | null>(null);
+
+  const { data: therapistWalletAddress } = useTherapistWalletAddress(
+    therapist?.id,
+  );
 
   if (isLoading) {
     return (
@@ -72,7 +76,7 @@ export default function TherapistDetailPage({ params }: Props) {
 
   async function handlePaymentSuccess(boc: string) {
     if (!therapist || !selectedSlot || !bookingDate) return;
-    const booking = await createBooking.mutateAsync({
+    await bookAndPay.mutateAsync({
       therapist_id: therapist.id,
       booking_date: bookingDate,
       start_time: selectedSlot.start_time,
@@ -81,11 +85,7 @@ export default function TherapistDetailPage({ params }: Props) {
       upfront_percent: therapist.upfront_percent,
       upfront_amount: upfrontAmount,
       remaining_amount: remainingAmount,
-    });
-    await payUpfront.mutateAsync({
-      bookingId: booking.id,
       txHash: boc,
-      isFullPayment: therapist.upfront_percent === 100,
     });
     setTxHash(boc);
     setDrawerStep("success");
@@ -273,40 +273,12 @@ export default function TherapistDetailPage({ params }: Props) {
 
             {drawerStep === "success" ? (
               /* ── Success state ── */
-              <div className="flex flex-col items-center py-4 pb-2 text-center">
-                <div className="bg-primary/10 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-                  <svg
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="var(--primary)"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </div>
-                <h2 className="text-foreground mb-1 text-xl font-bold">
-                  Booking confirmed!
-                </h2>
-                <p className="text-muted-foreground mb-1 text-sm">
-                  {formatTon(upfrontAmount)} sent to {therapist.display_name}
-                </p>
-                {txHash && (
-                  <p className="text-muted-foreground mb-6 max-w-xs text-xs break-all opacity-60">
-                    tx: {txHash.slice(0, 32)}…
-                  </p>
-                )}
-                <Button
-                  size="lg"
-                  className="w-full rounded-2xl"
-                  onClick={() => router.push("/client/bookings")}
-                >
-                  View my bookings
-                </Button>
-              </div>
+              <BookingSuccessCard
+                therapistName={therapist.display_name}
+                upfrontAmount={upfrontAmount}
+                txHash={txHash}
+                onViewBookings={() => router.push("/client/bookings")}
+              />
             ) : (
               /* ── Form state ── */
               <>
@@ -373,7 +345,7 @@ export default function TherapistDetailPage({ params }: Props) {
 
                 {/* Pay */}
                 <PayButton
-                  therapistWallet={therapist.}
+                  therapistWallet={therapistWalletAddress}
                   amountTon={upfrontAmount}
                   label={`Pay ${formatTon(upfrontAmount)} now`}
                   onSuccess={handlePaymentSuccess}

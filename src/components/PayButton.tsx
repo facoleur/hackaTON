@@ -65,6 +65,9 @@ export function PayButton({
       try {
         closingBehavior.disableConfirmation();
       } catch {}
+      try {
+        swipeBehavior.enableVertical();
+      } catch {}
     }
   }
 

@@ -23,13 +23,12 @@ export default function PayPage({ params }: Props) {
   const { bookingId } = use(params);
   const { data: booking, isLoading } = useBooking(bookingId);
 
-  const { data: therapistWalletAddress } = useTherapistWalletAddress(
-    booking?.therapist_profiles?.id ?? "",
-  );
-
   const payUpfront = usePayUpfront();
   const payFinal = usePayFinal();
   const rateAndPay = useRateAndPayFinal();
+  const { data: therapistWalletAddress } = useTherapistWalletAddress(
+    booking?.therapist_id ?? "",
+  );
 
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
