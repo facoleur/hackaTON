@@ -101,9 +101,9 @@ export function Providers({ children, role }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <TonConnectUIProvider
-        manifestUrl={`${process.env.NEXT_PUBLIC_APP_URL}/tonconnect-manifest.json`}
+        manifestUrl={`${process.env.NEXT_PUBLIC_MANIFEST_URL ?? process.env.NEXT_PUBLIC_APP_URL}/tonconnect-manifest.json`}
         actionsConfiguration={{
-          twaReturnUrl: `https://t.me/${process.env.NEXT_PUBLIC_BOT_USERNAME}`,
+          twaReturnUrl: `https://t.me/canette_marketplace_bot`,
         }}
       >
         {didMount ? (
