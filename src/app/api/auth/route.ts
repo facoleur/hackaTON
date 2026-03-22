@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       process.env.NODE_ENV !== "development" &&
       process.env.VALIDATE_INIT_DATA === "true"
     ) {
-      const validationToken = process.env.TELEGRAM_BOT_TOKEN_THERAPIST!;
+      const validationToken = process.env.TELEGRAM_BOT_TOKEN!;
       validateInitData(initData, validationToken);
     }
 

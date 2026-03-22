@@ -25,13 +25,13 @@ export async function POST(req: NextRequest) {
           .eq('id', bookingId);
       }
 
-      const clientToken = process.env.TELEGRAM_BOT_TOKEN_CLIENT!;
+      const token = process.env.TELEGRAM_BOT_TOKEN!;
 
       await Promise.allSettled([
-        answerCallbackQuery(clientToken, cq.id),
+        answerCallbackQuery(token, cq.id),
         cq.message
           ? editTelegramMessage(
-              clientToken,
+              token,
               cq.message.chat.id,
               cq.message.message_id,
               `${'★'.repeat(rating)}${'☆'.repeat(5 - rating)} — thanks for your rating!`,

@@ -25,8 +25,7 @@ export async function GET(req: NextRequest) {
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
 
-  const clientToken = process.env.TELEGRAM_BOT_TOKEN_CLIENT!;
-  const therapistToken = process.env.TELEGRAM_BOT_TOKEN_THERAPIST!;
+  const token = process.env.TELEGRAM_BOT_TOKEN!;
 
   // ── 24h reminders ──────────────────────────────────────────────────────────
 
@@ -58,11 +57,11 @@ export async function GET(req: NextRequest) {
 
     await Promise.allSettled([
       clientId
-        ? sendTelegramMessage(clientToken, clientId,
+        ? sendTelegramMessage(token, clientId,
             `⏰ Reminder: session tomorrow\n\nYour session with ${therapistName} is tomorrow.\n📅 ${date} at ${time} · ${duration} min`)
         : Promise.resolve(),
       therapistId
-        ? sendTelegramMessage(therapistToken, therapistId,
+        ? sendTelegramMessage(token, therapistId,
             `⏰ Reminder: session tomorrow\n\nYou have a session with ${clientName} tomorrow.\n📅 ${date} at ${time} · ${duration} min`)
         : Promise.resolve(),
     ]);
@@ -99,7 +98,7 @@ export async function GET(req: NextRequest) {
       }));
 
       await sendTelegramInlineKeyboard(
-        clientToken,
+        token,
         clientId,
         `⭐ How was your session?\n\nRate your session with ${therapistName}:`,
         buttons,
