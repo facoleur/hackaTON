@@ -6,37 +6,26 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <div className="flex h-dvh w-full flex-col overflow-hidden">
+    <div className="flex h-dvh w-full flex-col gap-4 overflow-hidden bg-slate-100 p-2">
       {/* Therapist — 30% */}
       <button
-        className="flex flex-3 cursor-pointer flex-col items-center justify-center gap-2 transition-opacity active:opacity-90"
-        style={{
-          background: "linear-gradient(160deg, #1e293b 0%, #0f172a 100%)",
-        }}
+        className="flex flex-3 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-8 border-white bg-cover bg-center bg-no-repeat shadow-2xl transition-opacity active:opacity-90"
+        style={{ backgroundImage: "url('/therapist.jpg')" }}
         onClick={() => router.push("/therapist")}
       >
-        <span className="text-4xl">💆</span>
-        <span className="text-xl font-bold tracking-tight text-slate-100">
+        <span className="text-7xl font-bold tracking-tight text-black">
           I&apos;m a therapist
         </span>
-        <span className="text-sm font-medium text-slate-400">
-          Manage your schedule & clients
-        </span>
       </button>
+
       {/* Client — 70% */}
       <button
-        className="flex flex-7 cursor-pointer flex-col items-center justify-center gap-3 transition-opacity active:opacity-90"
-        style={{
-          background: "linear-gradient(160deg, #f5e6d3 0%, #e8c9a8 100%)",
-        }}
+        className="flex flex-7 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-8 border-white bg-cover bg-center transition-opacity active:opacity-90"
+        style={{ backgroundImage: "url('/client.jpg')" }}
         onClick={() => router.push("/client")}
       >
-        <span className="text-6xl">🤲</span>
-        <span className="text-3xl font-bold tracking-tight text-stone-800">
+        <span className="text-7xl font-bold tracking-tight text-stone-800">
           Book a massage
-        </span>
-        <span className="text-base font-medium text-stone-500">
-          Find and book a therapist near you
         </span>
       </button>
 
