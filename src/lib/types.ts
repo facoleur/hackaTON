@@ -22,6 +22,7 @@ export interface User {
 export interface TherapistProfile {
   id: string;
   user_id: string;
+  wallet_address: string | null;
   display_name: string;
   bio: string | null;
   price_ton: number;

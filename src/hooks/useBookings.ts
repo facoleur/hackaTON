@@ -56,12 +56,27 @@ export function useBooking(bookingId: string) {
       const supabase = getSupabaseClient(token);
       const { data, error } = await supabase
         .from("bookings")
-        .select("*, therapist_profiles(*)")
+        .select("*, therapist_profiles(*, users(wallet_address))")
         .eq("id", bookingId)
         .single();
 
       if (error) throw error;
-      return data as Booking;
+      const { therapist_profiles, ...booking } = data as Booking & {
+        therapist_profiles: (Booking["therapist_profiles"] & {
+          users: { wallet_address: string | null } | null;
+        }) | undefined;
+      };
+      if (therapist_profiles) {
+        const { users, ...profile } = therapist_profiles;
+        return {
+          ...booking,
+          therapist_profiles: {
+            ...profile,
+            wallet_address: users?.wallet_address ?? null,
+          },
+        } as Booking;
+      }
+      return { ...booking, therapist_profiles } as Booking;
     },
     enabled: !!token && !!bookingId,
   });

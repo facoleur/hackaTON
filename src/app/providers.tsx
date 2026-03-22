@@ -12,6 +12,7 @@ import { TonConnectUIProvider, useTonWallet } from "@tonconnect/ui-react";
 import { type PropsWithChildren, useEffect, useRef } from "react";
 
 import { useDidMount } from "@/hooks/useDidMount";
+import { getSupabaseClient } from "@/lib/supabase-client";
 import type { Role } from "@/lib/types";
 import { useAuthStore } from "@/stores/useAuthStore";
 
@@ -50,11 +51,25 @@ function AuthInit({ role }: { role: Role }) {
 function WalletSync() {
   const wallet = useTonWallet();
   const setWalletAddress = useAuthStore((s) => s.setWalletAddress);
+  const token = useAuthStore((s) => s.supabaseToken);
+  const userId = useAuthStore((s) => s.telegramUser?.id);
 
   useEffect(() => {
     const address = wallet?.account?.address ?? null;
     setWalletAddress(address);
-  }, [wallet, setWalletAddress]);
+
+    if (!token || !userId) return;
+
+    const supabase = getSupabaseClient(token);
+    supabase
+      .from("users")
+      .update({ wallet_address: address })
+      .eq("id", userId)
+      .then(({ error }) => {
+        if (error) console.error("[WalletSync] failed to persist wallet", error);
+        else console.log("[WalletSync] wallet persisted", address);
+      });
+  }, [wallet, setWalletAddress, token, userId]);
 
   return null;
 }

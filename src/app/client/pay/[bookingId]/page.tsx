@@ -10,7 +10,6 @@ import {
   usePayUpfront,
   useRateAndPayFinal,
 } from "@/hooks/usePayments";
-import { useTherapistWalletAddress } from "@/hooks/useTherapistWalletAddress";
 import { formatTon } from "@/lib/ton";
 import type { TherapistProfile } from "@/lib/types";
 import { use, useState } from "react";
@@ -22,8 +21,6 @@ interface Props {
 export default function PayPage({ params }: Props) {
   const { bookingId } = use(params);
   const { data: booking, isLoading: bookingLoading } = useBooking(bookingId);
-  const { data: therapistWalletAddress, isLoading: walletLoading } =
-    useTherapistWalletAddress(booking?.therapist_id ?? "");
 
   const payUpfront = usePayUpfront();
   const payFinal = usePayFinal();
@@ -31,7 +28,7 @@ export default function PayPage({ params }: Props) {
 
   const [rated, setRated] = useState(false);
 
-  if (bookingLoading || walletLoading) {
+  if (bookingLoading) {
     return (
       <div className="flex justify-center p-10">
         <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
@@ -39,7 +36,9 @@ export default function PayPage({ params }: Props) {
     );
   }
 
-  if (!booking || !booking.therapist_profiles || !therapistWalletAddress) {
+  const therapistWalletAddress = booking?.therapist_profiles?.wallet_address;
+
+  if (!booking || !booking.therapist_profiles) {
     return (
       <div className="flex flex-col items-center justify-center px-8 py-16 text-center">
         <p className="text-foreground font-medium">Not found</p>

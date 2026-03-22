@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useAvailability } from "@/hooks/useAvailability";
 import { useSwipeBack } from "@/hooks/useSwipeBack";
 import { useTherapist } from "@/hooks/useTherapists";
-import { useTherapistWalletAddress } from "@/hooks/useTherapistWalletAddress";
 import { DAY_NAMES, formatTime } from "@/lib/date";
 import { formatTon } from "@/lib/ton";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -22,9 +21,7 @@ export default function TherapistDetailPage({ params }: Props) {
   const { id } = use(params);
   const { data: therapist, isLoading } = useTherapist(id);
   const { data: slots = [] } = useAvailability(id);
-  const { data: therapistWalletAddress } = useTherapistWalletAddress(
-    therapist?.id ?? "",
-  );
+
   const token = useAuthStore((s) => s.supabaseToken);
   const swipeBack = useSwipeBack();
 
@@ -211,7 +208,7 @@ export default function TherapistDetailPage({ params }: Props) {
       <BookingDrawer
         therapist={therapist}
         slots={slots}
-        walletAddress={therapistWalletAddress}
+        walletAddress={therapist.wallet_address}
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
       />

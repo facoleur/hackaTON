@@ -29,6 +29,14 @@ export function PayButton({
   const wallet = useTonWallet();
   const [loading, setLoading] = useState(false);
 
+  console.log("[PayButton] render", {
+    wallet: !!wallet,
+    therapistWallet,
+    amountTon,
+    disabled,
+    isDisabled: disabled || loading || !therapistWallet,
+  });
+
   async function handlePay() {
     console.log("[PayButton] clicked", { wallet: !!wallet, therapistWallet, amountTon, disabled });
 

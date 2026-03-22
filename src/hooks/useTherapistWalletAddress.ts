@@ -8,6 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 function useTherapistWalletAddress(therapistProfileId: string) {
   const token = useAuthStore((s) => s.supabaseToken);
 
+  console.log("th id: ", therapistProfileId);
+
   return useQuery({
     queryKey: queryKeys.therapists.walletAddress(therapistProfileId),
     queryFn: async () => {
@@ -21,8 +23,8 @@ function useTherapistWalletAddress(therapistProfileId: string) {
       if (error) throw error;
       const users = data?.users as unknown as {
         wallet_address: string | null;
-      }[];
-      return users?.[0]?.wallet_address ?? null;
+      } | null;
+      return users?.wallet_address ?? null;
     },
     enabled: !!token && !!therapistProfileId,
   });

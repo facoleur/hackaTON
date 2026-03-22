@@ -40,7 +40,19 @@ export function useTherapist(id: string) {
         .single();
 
       if (error) throw error;
-      return data as TherapistProfile;
+
+      const { data: userData } = await supabase
+        .from("users")
+        .select("wallet_address")
+        .eq("id", (data as TherapistProfile).user_id)
+        .single();
+
+      console.log("[useTherapist] userData", userData);
+
+      return {
+        ...(data as TherapistProfile),
+        wallet_address: userData?.wallet_address ?? null,
+      } satisfies TherapistProfile;
     },
     enabled: !!token && !!id,
   });
