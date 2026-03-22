@@ -6,7 +6,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useQuery } from "@tanstack/react-query";
 
 /** Statuses that occupy a slot (i.e. not free to rebook) */
-const ACTIVE_STATUSES = ["pending", "confirmed", "upfront_paid", "completed", "fully_paid"];
+const ACTIVE_STATUSES = ["pending", "confirmed", "fully_paid", "completed"];
 
 /**
  * Returns a Set of "YYYY-MM-DD|HH:MM" strings representing slots that are

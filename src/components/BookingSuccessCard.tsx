@@ -5,14 +5,14 @@ import { formatTon } from "@/lib/ton";
 
 interface BookingSuccessCardProps {
   therapistName: string;
-  upfrontAmount: number;
+  amountPaid: number;
   txHash: string | null;
   onViewBookings: () => void;
 }
 
 export function BookingSuccessCard({
   therapistName,
-  upfrontAmount,
+  amountPaid,
   txHash,
   onViewBookings,
 }: BookingSuccessCardProps) {
@@ -36,7 +36,7 @@ export function BookingSuccessCard({
         Booking confirmed!
       </h2>
       <p className="text-muted-foreground mb-1 text-sm">
-        {formatTon(upfrontAmount)} sent to {therapistName}
+        {formatTon(amountPaid)} sent to {therapistName}
       </p>
       {txHash && (
         <p className="text-muted-foreground mb-6 max-w-xs text-xs break-all opacity-60">

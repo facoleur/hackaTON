@@ -103,14 +103,6 @@ export default function ProfilePage() {
             {...register("max_multiplier")}
           />
         </FormField>
-        <FormField label="Upfront % (10–100)" error={errors.upfront_percent}>
-          <Input
-            type="number"
-            inputMode="numeric"
-            placeholder="100"
-            {...register("upfront_percent")}
-          />
-        </FormField>
       </FormSection>
 
       <FormSection >

@@ -38,8 +38,6 @@ export function BookingDrawer({
 
   const duration = therapist.duration_minutes * multiplier;
   const totalPrice = therapist.price_ton * multiplier;
-  const upfrontAmount = (totalPrice * therapist.upfront_percent) / 100;
-  const remainingAmount = totalPrice - upfrontAmount;
 
   const datedSlots = useMemo(
     () => expandSlots(slots, bookedSet, duration),
@@ -58,9 +56,6 @@ export function BookingDrawer({
       start_time: selectedSlot.start_time,
       duration_minutes: duration,
       amount_ton: totalPrice,
-      upfront_percent: therapist.upfront_percent,
-      upfront_amount: upfrontAmount,
-      remaining_amount: remainingAmount,
       txHash: boc,
     });
     setTxHash(boc);
@@ -79,7 +74,7 @@ export function BookingDrawer({
         {step === "success" ? (
           <BookingSuccessCard
             therapistName={therapist.display_name}
-            upfrontAmount={upfrontAmount}
+            amountPaid={totalPrice}
             txHash={txHash}
             onViewBookings={() => router.push("/client/bookings")}
           />
@@ -145,8 +140,8 @@ export function BookingDrawer({
 
             <PayButton
               therapistWallet={walletAddress}
-              amountTon={upfrontAmount}
-              label={`Pay ${formatTon(upfrontAmount)} now`}
+              amountTon={totalPrice}
+              label={`Pay ${formatTon(totalPrice)}`}
               onSuccess={handlePaymentSuccess}
               disabled={!selected}
             />

@@ -31,14 +31,13 @@ export function useBookAndPay() {
       console.log("[useBookAndPay] insert result", { booking, bookingError });
       if (bookingError) throw bookingError;
 
-      const isFullPayment = bookingInput.upfront_percent === 100;
-      console.log("[useBookAndPay] updating payment status", { bookingId: (booking as Booking).id, isFullPayment, txHash });
+      console.log("[useBookAndPay] updating to fully_paid", { bookingId: (booking as Booking).id, txHash });
 
       const { error: payError } = await supabase
         .from("bookings")
         .update({
-          status: isFullPayment ? "fully_paid" : "upfront_paid",
-          tx_hash_upfront: txHash,
+          status: "fully_paid",
+          tx_hash: txHash,
         })
         .eq("id", (booking as Booking).id);
 

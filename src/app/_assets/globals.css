@@ -102,8 +102,7 @@ body {
   color: #999999;
   background-color: rgb(153 153 153 / 0.13);
 }
-.status-badge-confirmed,
-.status-badge-upfront_paid {
+.status-badge-confirmed {
   color: #2481cc;
   background-color: rgb(36 129 204 / 0.13);
 }

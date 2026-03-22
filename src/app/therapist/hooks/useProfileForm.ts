@@ -12,7 +12,6 @@ export interface ProfileFormValues {
   price_ton: string;
   duration_minutes: string;
   max_multiplier: string;
-  upfront_percent: string;
   location_name: string;
   is_active: boolean;
 }
@@ -29,7 +28,6 @@ export function useProfileForm() {
       price_ton: "",
       duration_minutes: "60",
       max_multiplier: "3",
-      upfront_percent: "100",
       location_name: "",
       is_active: true,
     },
@@ -44,7 +42,6 @@ export function useProfileForm() {
       price_ton: String(profile.price_ton ?? ""),
       duration_minutes: String(profile.duration_minutes ?? 60),
       max_multiplier: String(profile.max_multiplier ?? 3),
-      upfront_percent: String(profile.upfront_percent ?? 100),
       location_name: profile.location_name ?? "",
       is_active: profile.is_active ?? true,
     });
@@ -59,7 +56,6 @@ export function useProfileForm() {
         price_ton: parseFloat(values.price_ton),
         duration_minutes: parseInt(values.duration_minutes),
         max_multiplier: Math.min(10, Math.max(1, parseInt(values.max_multiplier))),
-        upfront_percent: Math.min(100, Math.max(10, parseInt(values.upfront_percent))),
         location_name: values.location_name || null,
         is_active: values.is_active,
       });

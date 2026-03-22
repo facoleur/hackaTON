@@ -56,16 +56,6 @@ export function BookingInfoCard({ booking }: Props) {
       {/* Detail rows */}
       <div className="divide-y divide-border">
         <InfoRow label="Total">{formatTon(booking.amount_ton)}</InfoRow>
-        {booking.upfront_percent < 100 && (
-          <>
-            <InfoRow label={`Upfront (${booking.upfront_percent}%)`}>
-              {formatTon(booking.upfront_amount)}
-            </InfoRow>
-            <InfoRow label="Remaining">
-              {formatTon(booking.remaining_amount)}
-            </InfoRow>
-          </>
-        )}
       </div>
     </div>
   );

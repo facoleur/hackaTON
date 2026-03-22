@@ -1,19 +1,17 @@
 interface Props {
-  upfrontHash: string | null;
-  finalHash: string | null;
+  txHash: string | null;
 }
 
-export function TransactionHashesCard({ upfrontHash, finalHash }: Props) {
-  if (!upfrontHash) return null;
+export function TransactionHashesCard({ txHash }: Props) {
+  if (!txHash) return null;
 
   return (
     <div>
       <p className="text-muted-foreground mb-1 px-4 text-xs font-medium tracking-wide">
-        Transaction Hashes
+        Transaction
       </p>
-      <div className="bg-card divide-border mx-4 divide-y overflow-hidden rounded-xl">
-        <TxRow label="Upfront TX" hash={upfrontHash} />
-        {finalHash && <TxRow label="Final TX" hash={finalHash} />}
+      <div className="bg-card mx-4 overflow-hidden rounded-xl">
+        <TxRow label="TX" hash={txHash} />
       </div>
     </div>
   );

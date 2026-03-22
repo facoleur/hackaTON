@@ -197,7 +197,7 @@ export default function TherapistDashboard() {
                 <div className="mt-1">
                   <BookingStatusBadge status={b.status} />
                 </div>
-                {b.status === "upfront_paid" && (
+                {b.status === "fully_paid" && (
                   <div className="mt-2">
                     <Button
                       size="sm"

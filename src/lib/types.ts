@@ -3,7 +3,6 @@ export type Role = "client" | "therapist";
 export type BookingStatus =
   | "pending"
   | "confirmed"
-  | "upfront_paid"
   | "completed"
   | "fully_paid"
   | "rejected"
@@ -28,7 +27,6 @@ export interface TherapistProfile {
   price_ton: number;
   duration_minutes: number;
   max_multiplier: number;
-  upfront_percent: number;
   location_name: string | null;
   location_lat: number | null;
   location_lng: number | null;
@@ -55,12 +53,8 @@ export interface Booking {
   start_time: string; // HH:MM
   duration_minutes: number;
   amount_ton: number;
-  upfront_percent: number;
-  upfront_amount: number;
-  remaining_amount: number;
   status: BookingStatus;
-  tx_hash_upfront: string | null;
-  tx_hash_final: string | null;
+  tx_hash: string | null;
   rating: number | null;
   review: string | null;
   created_at: string;
@@ -76,7 +70,4 @@ export interface CreateBookingInput {
   start_time: string;
   duration_minutes: number;
   amount_ton: number;
-  upfront_percent: number;
-  upfront_amount: number;
-  remaining_amount: number;
 }

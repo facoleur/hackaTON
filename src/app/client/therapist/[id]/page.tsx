@@ -47,8 +47,6 @@ export default function TherapistDetailPage({ params }: Props) {
   }
 
   const photos = therapist.photos?.length ? therapist.photos : [];
-  const upfrontAmount = (therapist.price_ton * therapist.upfront_percent) / 100;
-  const remainingAmount = therapist.price_ton - upfrontAmount;
 
   return (
     <>
@@ -138,22 +136,6 @@ export default function TherapistDetailPage({ params }: Props) {
                   {therapist.duration_minutes} min
                 </span>
               </div>
-              <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-foreground text-sm">Pay now</span>
-                <span className="text-primary text-sm font-semibold">
-                  {formatTon(upfrontAmount)}
-                </span>
-              </div>
-              {therapist.upfront_percent < 100 && (
-                <div className="flex items-center justify-between px-4 py-3">
-                  <span className="text-foreground text-sm">
-                    Pay after session
-                  </span>
-                  <span className="text-foreground text-sm font-medium">
-                    {formatTon(remainingAmount)}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
 

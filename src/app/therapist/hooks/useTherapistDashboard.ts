@@ -23,7 +23,7 @@ export function useTherapistDashboard() {
   const pending = bookings?.filter((b) => b.status === "pending") ?? [];
   const active =
     bookings?.filter((b) =>
-      ["confirmed", "upfront_paid"].includes(b.status),
+      ["confirmed", "fully_paid"].includes(b.status),
     ) ?? [];
   const history =
     bookings?.filter((b) =>

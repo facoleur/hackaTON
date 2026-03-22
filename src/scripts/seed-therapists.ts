@@ -18,7 +18,6 @@ const therapists = [
     bio: "Deep tissue & sports massage. 8 years experience.",
     price_ton: 1.5,
     duration_minutes: 60,
-    upfront_percent: 50,
     location_name: "Zürich Enge",
     location_lat: 47.3625,
     location_lng: 8.5312,
@@ -43,7 +42,6 @@ const therapists = [
     bio: "Swedish & relaxation massage. Mobile service available.",
     price_ton: 2.0,
     duration_minutes: 90,
-    upfront_percent: 100,
     location_name: "Zürich Oerlikon",
     location_lat: 47.4111,
     location_lng: 8.5443,
@@ -66,7 +64,6 @@ const therapists = [
     bio: "Traditional Thai massage & stretching. Certified in Chiang Mai.",
     price_ton: 1.0,
     duration_minutes: 60,
-    upfront_percent: 30,
     location_name: "Zürich Wiedikon",
     location_lat: 47.37,
     location_lng: 8.52,
@@ -122,7 +119,6 @@ async function seed() {
           bio: t.bio,
           price_ton: t.price_ton,
           duration_minutes: t.duration_minutes,
-          upfront_percent: t.upfront_percent,
           location_name: t.location_name,
           location_lat: t.location_lat,
           location_lng: t.location_lng,
@@ -158,7 +154,7 @@ async function seed() {
     }
 
     console.log(
-      `  ${t.display_name} — ${t.location_name} — ${t.price_ton} TON — ${t.upfront_percent}% upfront — ${t.availability.length} slots`
+      `  ${t.display_name} — ${t.location_name} — ${t.price_ton} TON — ${t.availability.length} slots`
     );
   }
 

@@ -8,9 +8,8 @@ import { TransactionHashesCard } from "@/components/TransactionHashesCard";
 import { useBooking } from "@/hooks/useBookings";
 import {
   useCancelRating,
-  usePayFinal,
-  usePayUpfront,
-  useRateAndPayFinal,
+  usePay,
+  useRateSession,
 } from "@/hooks/usePayments";
 import { formatTon } from "@/lib/ton";
 import type { TherapistProfile } from "@/lib/types";
@@ -24,12 +23,10 @@ export default function PayPage({ params }: Props) {
   const { bookingId } = use(params);
   const { data: booking, isLoading } = useBooking(bookingId);
 
-  const payUpfront = usePayUpfront();
-  const payFinal = usePayFinal();
-  const rateAndPay = useRateAndPayFinal();
+  const pay = usePay();
+  const rateSession = useRateSession();
   const cancelRating = useCancelRating();
 
-  // optimistic flag so the rating section shows immediately after submitting
   const [rated, setRated] = useState(false);
 
   if (isLoading) {
@@ -57,13 +54,12 @@ export default function PayPage({ params }: Props) {
   const hasRating = booking.rating != null || rated;
   const effectiveRating = booking.rating ?? 0;
 
-  async function handleUpfront(boc: string) {
-    const isFullPayment = booking!.upfront_percent === 100;
-    await payUpfront.mutateAsync({ bookingId, txHash: boc, isFullPayment });
+  async function handlePay(boc: string) {
+    await pay.mutateAsync({ bookingId, txHash: boc });
   }
 
   async function handleRate(rating: number) {
-    await rateAndPay.mutateAsync({ bookingId, rating });
+    await rateSession.mutateAsync({ bookingId, rating });
     setRated(true);
   }
 
@@ -72,15 +68,11 @@ export default function PayPage({ params }: Props) {
     setRated(false);
   }
 
-  async function handleFinal(boc: string) {
-    await payFinal.mutateAsync({ bookingId, txHash: boc });
-  }
-
   return (
     <div className="space-y-4 py-4">
       <BookingInfoCard booking={bookingWithTherapist} />
 
-      {/* Upfront payment */}
+      {/* Payment */}
       {booking.status === "confirmed" && (
         <div>
           <p className="text-muted-foreground mb-1 px-4 text-xs font-medium tracking-wide">
@@ -88,19 +80,17 @@ export default function PayPage({ params }: Props) {
           </p>
           <div className="bg-card mx-4 overflow-hidden rounded-xl">
             <div className="border-border flex items-center justify-between border-b px-4 py-3">
-              <span className="text-foreground text-sm">
-                Pay upfront ({booking.upfront_percent}%)
-              </span>
+              <span className="text-foreground text-sm">Total</span>
               <span className="text-muted-foreground text-sm">
-                {formatTon(booking.upfront_amount)}
+                {formatTon(booking.amount_ton)}
               </span>
             </div>
             <div className="px-4 pt-3 pb-4">
               <PayButton
                 therapistWallet={therapistWallet}
-                amountTon={booking.upfront_amount}
-                label={`Pay ${formatTon(booking.upfront_amount)} upfront`}
-                onSuccess={handleUpfront}
+                amountTon={booking.amount_ton}
+                label={`Pay ${formatTon(booking.amount_ton)}`}
+                onSuccess={handlePay}
               />
             </div>
           </div>
@@ -110,7 +100,7 @@ export default function PayPage({ params }: Props) {
       {/* Rating section (session completed) */}
       {booking.status === "completed" && !hasRating && (
         <RateSessionForm
-          isPending={rateAndPay.isPending}
+          isPending={rateSession.isPending}
           onSubmit={handleRate}
         />
       )}
@@ -123,34 +113,6 @@ export default function PayPage({ params }: Props) {
         />
       )}
 
-      {/* Final payment */}
-      {booking.status === "completed" &&
-        booking.upfront_percent < 100 && (
-          <div>
-            <p className="text-muted-foreground mb-1 px-4 text-xs font-medium tracking-wide">
-              Final Payment
-            </p>
-            <div className="bg-card mx-4 overflow-hidden rounded-xl">
-              <div className="border-border flex items-center justify-between border-b px-4 py-3">
-                <span className="text-foreground text-sm">
-                  Remaining amount
-                </span>
-                <span className="text-muted-foreground text-sm">
-                  {formatTon(booking.remaining_amount)}
-                </span>
-              </div>
-              <div className="px-4 pt-3 pb-4">
-                <PayButton
-                  therapistWallet={therapistWallet}
-                  amountTon={booking.remaining_amount}
-                  label={`Pay ${formatTon(booking.remaining_amount)} remaining`}
-                  onSuccess={handleFinal}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
       {/* All done */}
       {booking.status === "fully_paid" && (
         <div className="flex flex-col items-center justify-center px-8 py-16 text-center">
@@ -161,10 +123,7 @@ export default function PayPage({ params }: Props) {
         </div>
       )}
 
-      <TransactionHashesCard
-        upfrontHash={booking.tx_hash_upfront}
-        finalHash={booking.tx_hash_final}
-      />
+      <TransactionHashesCard txHash={booking.tx_hash} />
     </div>
   );
 }
