@@ -77,7 +77,7 @@ export function TherapistShell({ children }: PropsWithChildren) {
                     active ? "bg-slate-500/25" : "text-muted-foreground",
                   )}
                 >
-                  <tab.Icon size={18} />
+                  <tab.Icon size={24} />
                   {tab.label}
                 </button>
               );
