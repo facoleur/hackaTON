@@ -28,7 +28,7 @@ function NoAvailabilityBanner({ onPress }: { onPress: () => void }) {
 
 function EmptyDashboard() {
   return (
-    <div className="flex flex-col items-center justify-center px-8 py-20 text-center">
+    <div className="flex flex-col items-center justify-center px-1 py-20 text-center">
       <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
         <svg
           width="40"
@@ -51,9 +51,7 @@ function EmptyDashboard() {
           />
         </svg>
       </div>
-      <p className="text-foreground text-base font-semibold">
-        No bookings yet
-      </p>
+      <p className="text-foreground text-base font-semibold">No bookings yet</p>
       <p className="text-muted-foreground mt-1.5 max-w-[200px] text-sm leading-relaxed">
         New session requests from clients will show up here.
       </p>
@@ -120,7 +118,7 @@ export default function TherapistDashboard() {
   if (isLoading) {
     return (
       <div className="py-4">
-        <div className="bg-card rounded-xl overflow-hidden divide-y divide-border mx-4">
+        <div className="bg-card divide-border mx-4 divide-y overflow-hidden rounded-xl">
           {Array.from({ length: 3 }).map((_, i) => (
             <BookingCardSkeleton key={i} />
           ))}
@@ -133,16 +131,25 @@ export default function TherapistDashboard() {
 
   const noSlots = slots !== undefined && slots.length === 0;
 
-  if (!bookings?.length) return (
-    <>
-      {noSlots && <NoAvailabilityBanner onPress={() => router.push("/therapist/availability")} />}
-      <EmptyDashboard />
-    </>
-  );
+  if (!bookings?.length)
+    return (
+      <>
+        {noSlots && (
+          <NoAvailabilityBanner
+            onPress={() => router.push("/therapist/availability")}
+          />
+        )}
+        <EmptyDashboard />
+      </>
+    );
 
   return (
     <div className="space-y-4 py-4">
-      {noSlots && <NoAvailabilityBanner onPress={() => router.push("/therapist/availability")} />}
+      {noSlots && (
+        <NoAvailabilityBanner
+          onPress={() => router.push("/therapist/availability")}
+        />
+      )}
       {/* Pending requests */}
       {pending.length > 0 && (
         <div>
@@ -156,7 +163,8 @@ export default function TherapistDashboard() {
                   {b.users?.first_name ?? "Client"}
                 </p>
                 <p className="text-muted-foreground mt-0.5 text-xs">
-                  {b.booking_date} · {formatTime(b.start_time)} · {b.duration_minutes} min
+                  {b.booking_date} · {formatTime(b.start_time)} ·{" "}
+                  {b.duration_minutes} min
                 </p>
                 <p className="text-muted-foreground text-xs">
                   {formatTon(b.amount_ton)}

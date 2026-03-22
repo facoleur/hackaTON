@@ -1,19 +1,19 @@
 "use client";
 
 import { OnboardingFlow } from "@/app/therapist/onboarding/OnboardingFlow";
+import { Header } from "@/components/Header";
 import { useMyProfile } from "@/hooks/useProfile";
-import { useTelegramUser } from "@/hooks/useTelegramUser";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { TonConnectButton } from "@tonconnect/ui-react";
 import { backButton } from "@tma.js/sdk-react";
+import { CalendarDays, Clock, UserRound } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { type PropsWithChildren, useEffect } from "react";
 
 const tabs = [
-  { path: "/therapist", label: "Dashboard", icon: "📅" },
-  { path: "/therapist/availability", label: "Schedule", icon: "🕐" },
-  { path: "/therapist/profile", label: "Profile", icon: "👤" },
+  { path: "/therapist", label: "Dashboard", Icon: CalendarDays },
+  { path: "/therapist/availability", label: "Schedule", Icon: Clock },
+  { path: "/therapist/profile", label: "Profile", Icon: UserRound },
 ];
 
 function Spinner() {
@@ -21,26 +21,6 @@ function Spinner() {
     <div className="flex min-h-screen items-center justify-center">
       <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
     </div>
-  );
-}
-
-function TherapistHeader() {
-  const user = useTelegramUser();
-  const displayName = user
-    ? user.username
-      ? `@${user.username}`
-      : user.first_name
-    : null;
-
-  return (
-    <header className="bg-background border-border sticky top-0 z-20 flex items-center justify-between border-b px-4 py-2">
-      {displayName ? (
-        <span className="text-sm font-medium">{displayName}</span>
-      ) : (
-        <span />
-      )}
-      <TonConnectButton />
-    </header>
   );
 }
 
@@ -53,9 +33,7 @@ function OnboardingGate({ children }: PropsWithChildren) {
 
   if (profile === null) {
     return (
-      <OnboardingFlow
-        onDone={() => router.push("/therapist/availability")}
-      />
+      <OnboardingFlow onDone={() => router.push("/therapist/availability")} />
     );
   }
 
@@ -82,12 +60,12 @@ export function TherapistShell({ children }: PropsWithChildren) {
   return (
     <OnboardingGate>
       <div className="flex min-h-screen flex-col bg-slate-100">
-        <TherapistHeader />
-        <div className="mx-2 flex-1 overflow-x-hidden overflow-y-auto pb-16">
+        <Header />
+        <div className="mx-2 mb-26 flex-1 overflow-x-hidden overflow-y-auto">
           {children}
         </div>
-        <nav className="bg-card border-border fixed right-0 bottom-0 left-0 border-t">
-          <div className="flex">
+        <nav className="border-border fixed right-0 bottom-0 left-0 z-50 p-4 pb-12">
+          <div className="bg-card/70 flex rounded-full p-1 shadow-2xl! backdrop-blur-lg">
             {tabs.map((tab) => {
               const active = pathname === tab.path;
               return (
@@ -95,11 +73,11 @@ export function TherapistShell({ children }: PropsWithChildren) {
                   key={tab.path}
                   onClick={() => router.push(tab.path)}
                   className={cn(
-                    "flex flex-1 cursor-pointer flex-col items-center gap-1 border-none bg-transparent py-2 text-xs",
-                    active ? "text-primary" : "text-muted-foreground",
+                    "flex flex-1 cursor-pointer flex-col items-center gap-1 rounded-full border-none bg-transparent py-2 text-xs",
+                    active ? "bg-slate-500/25" : "text-muted-foreground",
                   )}
                 >
-                  <span className="text-xl">{tab.icon}</span>
+                  <tab.Icon size={18} />
                   {tab.label}
                 </button>
               );

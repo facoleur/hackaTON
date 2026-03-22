@@ -4,12 +4,13 @@ import { Header } from "@/components/Header";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/useUIStore";
 import { backButton } from "@tma.js/sdk-react";
+import { List, Search } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type PropsWithChildren } from "react";
 
 const tabs = [
-  { path: "/client", label: "Browse", icon: "🔍" },
-  { path: "/client/bookings", label: "Bookings", icon: "📋" },
+  { path: "/client", label: "Browse", Icon: Search },
+  { path: "/client/bookings", label: "Bookings", Icon: List },
 ];
 
 export function ClientShell({ children }: PropsWithChildren) {
@@ -31,8 +32,8 @@ export function ClientShell({ children }: PropsWithChildren) {
   }, [isRoot, router]);
 
   return (
-    <div className="safe-botton-zone-2">
-      <div className="flex flex-col overflow-hidden bg-slate-100">
+    <div className="safe-botton-zone-2 bg-slate-100">
+      <div className="flex flex-1 flex-col overflow-hidden bg-slate-100">
         <Header />
         <div
           className={cn(
@@ -59,7 +60,7 @@ export function ClientShell({ children }: PropsWithChildren) {
                       active ? "bg-slate-500/25" : "text-muted-foreground",
                     )}
                   >
-                    <span className="text-xl">{tab.icon}</span>
+                    <tab.Icon size={24} />
                     {tab.label}
                   </button>
                 );

@@ -110,7 +110,7 @@ export default function AvailabilityPage() {
   }
 
   return (
-    <div className="space-y-4 px-4 py-4">
+    <div className="space-y-4 px-1 py-4">
       {/* Day toggles */}
       <FormSection>
         <div className="flex flex-wrap gap-1">
@@ -120,7 +120,7 @@ export default function AvailabilityPage() {
               type="button"
               onClick={() => toggleDay(i)}
               className={cn(
-                "border-primary/30! min-h-11 min-w-11 flex-1 cursor-pointer rounded-md border px-4 py-1.5 text-sm",
+                "border-primary/30! min-h-11 min-w-11 flex-1 cursor-pointer rounded-md border px-2 text-center py-1.5 text-sm",
                 selectedDays.has(i)
                   ? "bg-primary text-primary-foreground border-primary"
                   : "text-primary border-primary hover:bg-primary/10 bg-transparent",

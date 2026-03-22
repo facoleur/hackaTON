@@ -22,7 +22,7 @@ export function formatBookingDate(dateStr: string): string {
   const [year, month, day] = dateStr.split("-").map(Number);
   const d = new Date(year, month - 1, day);
   return d.toLocaleDateString("en-US", {
-    weekday: "short",
+    // weekday: "short",
     month: "short",
     day: "numeric",
   });

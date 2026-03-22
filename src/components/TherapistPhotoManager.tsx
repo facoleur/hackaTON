@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useTherapistPhotos } from '@/hooks/useTherapistPhotos';
-import { hapticFeedback } from '@tma.js/sdk-react';
-import { ImagePlus, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useTherapistPhotos } from "@/hooks/useTherapistPhotos";
+import { hapticFeedback } from "@tma.js/sdk-react";
+import { ImagePlus, X } from "lucide-react";
+import { useRef, useState } from "react";
 
 export function TherapistPhotoManager() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -11,14 +11,16 @@ export function TherapistPhotoManager() {
   const [previews, setPreviews] = useState<string[]>([]);
 
   function handlePick() {
-    try { hapticFeedback.impactOccurred('light'); } catch {}
+    try {
+      hapticFeedback.impactOccurred("light");
+    } catch {}
     inputRef.current?.click();
   }
 
   async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
-    e.target.value = '';
+    e.target.value = "";
 
     const blobUrls = files.map((f) => URL.createObjectURL(f));
     setPreviews(blobUrls);
@@ -32,22 +34,24 @@ export function TherapistPhotoManager() {
   }
 
   function handleRemove(url: string) {
-    try { hapticFeedback.impactOccurred('medium'); } catch {}
+    try {
+      hapticFeedback.impactOccurred("medium");
+    } catch {}
     remove.mutate(url);
   }
 
   return (
     <div>
-      <p className="px-4 text-xs font-medium text-muted-foreground tracking-wide mb-2">
+      <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide">
         Photos
       </p>
 
       {!isProfileReady ? (
-        <p className="px-4 text-sm text-muted-foreground">
+        <p className="text-muted-foreground px-4 text-sm">
           Save your profile first to manage photos.
         </p>
       ) : (
-        <div className="grid grid-cols-3 gap-2 px-4">
+        <div className="grid grid-cols-3 gap-2">
           {photos.map((url, i) => (
             <PhotoTile
               key={url}
@@ -61,16 +65,19 @@ export function TherapistPhotoManager() {
 
           {/* Uploading previews */}
           {previews.map((url) => (
-            <div key={url} className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+            <div
+              key={url}
+              className="bg-muted relative aspect-square overflow-hidden rounded-xl"
+            >
               <img
                 src={url}
                 alt="Uploading…"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
                 draggable={false}
               />
               <div
                 className="absolute inset-0 flex items-center justify-center"
-                style={{ background: 'rgba(0,0,0,0.4)' }}
+                style={{ background: "rgba(0,0,0,0.4)" }}
               >
                 <Spinner white />
               </div>
@@ -82,9 +89,9 @@ export function TherapistPhotoManager() {
             type="button"
             onClick={handlePick}
             disabled={upload.isPending || !isProfileReady}
-            className="aspect-square rounded-xl flex flex-col items-center justify-center gap-1 border-2 border-dashed bg-transparent transition-opacity"
+            className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed bg-transparent transition-opacity"
             style={{
-              borderColor: 'var(--tg-theme-hint-color, #aaa)',
+              borderColor: "var(--tg-theme-hint-color, #aaa)",
               opacity: upload.isPending ? 0.5 : 1,
             }}
             aria-label="Add photos"
@@ -95,11 +102,11 @@ export function TherapistPhotoManager() {
               <>
                 <ImagePlus
                   size={22}
-                  style={{ color: 'var(--tg-theme-button-color, #2481cc)' }}
+                  style={{ color: "var(--tg-theme-button-color, #2481cc)" }}
                 />
                 <span
                   className="text-xs"
-                  style={{ color: 'var(--tg-theme-hint-color, #999)' }}
+                  style={{ color: "var(--tg-theme-hint-color, #999)" }}
                 >
                   Add
                 </span>
@@ -131,13 +138,19 @@ interface PhotoTileProps {
   onRemove: () => void;
 }
 
-function PhotoTile({ url, index, isRemoving, disabled, onRemove }: PhotoTileProps) {
+function PhotoTile({
+  url,
+  index,
+  isRemoving,
+  disabled,
+  onRemove,
+}: PhotoTileProps) {
   return (
-    <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+    <div className="bg-muted relative aspect-square overflow-hidden rounded-xl">
       <img
         src={url}
         alt={`Photo ${index + 1}`}
-        className="w-full h-full object-cover"
+        className="h-full w-full object-cover"
         draggable={false}
       />
 
@@ -146,8 +159,8 @@ function PhotoTile({ url, index, isRemoving, disabled, onRemove }: PhotoTileProp
         type="button"
         onClick={onRemove}
         disabled={disabled}
-        className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center border-none p-0"
-        style={{ background: 'rgba(0,0,0,0.55)' }}
+        className="absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full border-none p-0"
+        style={{ background: "rgba(0,0,0,0.55)" }}
         aria-label="Remove photo"
       >
         <X size={13} color="white" strokeWidth={2.5} />
@@ -155,8 +168,10 @@ function PhotoTile({ url, index, isRemoving, disabled, onRemove }: PhotoTileProp
 
       {/* Removal overlay */}
       {isRemoving && (
-        <div className="absolute inset-0 flex items-center justify-center"
-          style={{ background: 'rgba(0,0,0,0.4)' }}>
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.4)" }}
+        >
           <Spinner white />
         </div>
       )}
@@ -167,12 +182,12 @@ function PhotoTile({ url, index, isRemoving, disabled, onRemove }: PhotoTileProp
 function Spinner({ white }: { white?: boolean }) {
   return (
     <div
-      className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin"
+      className="h-5 w-5 animate-spin rounded-full border-2 border-t-transparent"
       style={{
         borderColor: white
-          ? 'rgba(255,255,255,0.8)'
-          : 'var(--tg-theme-button-color, #2481cc)',
-        borderTopColor: 'transparent',
+          ? "rgba(255,255,255,0.8)"
+          : "var(--tg-theme-button-color, #2481cc)",
+        borderTopColor: "transparent",
       }}
     />
   );
