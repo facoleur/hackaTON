@@ -30,16 +30,22 @@ export function PayButton({
   const [loading, setLoading] = useState(false);
 
   async function handlePay() {
+    console.log("[PayButton] clicked", { wallet: !!wallet, therapistWallet, amountTon, disabled });
+
     try {
       hapticFeedback.impactOccurred("medium");
     } catch {}
 
     if (!wallet) {
+      console.log("[PayButton] no wallet — opening modal");
       tonConnectUI.openModal();
       return;
     }
 
-    if (!therapistWallet) return;
+    if (!therapistWallet) {
+      console.warn("[PayButton] no therapistWallet — aborting");
+      return;
+    }
 
     setLoading(true);
 
@@ -52,13 +58,15 @@ export function PayButton({
 
     try {
       const tx = buildPayTransaction(therapistWallet, amountTon);
+      console.log("[PayButton] sending transaction", tx);
       const result = await tonConnectUI.sendTransaction(tx);
+      console.log("[PayButton] transaction result", result);
       try {
         hapticFeedback.notificationOccurred("success");
       } catch {}
       onSuccess(result.boc);
     } catch (err) {
-      console.error("Payment failed", err);
+      console.error("[PayButton] payment failed", err);
       try {
         hapticFeedback.notificationOccurred("error");
       } catch {}
