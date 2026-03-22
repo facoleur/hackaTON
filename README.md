@@ -10,7 +10,7 @@ Launch the marketplace here: https://t.me/canette_marketplace_bot
 
 ## Demo
 
-See [./docs/demo.mp4](./docs/demo.mp4)
+See [./demo/demo.mp4](./demo/demo.mp4)
 
 ### Overview
 
