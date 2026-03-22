@@ -19,20 +19,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing initData or role' }, { status: 400 });
     }
 
-    const botToken =
-      role === 'client'
-        ? process.env.TELEGRAM_BOT_TOKEN_CLIENT
-        : process.env.TELEGRAM_BOT_TOKEN_THERAPIST;
+    // Both apps are launched from the same bot (canette_marketplace_bot).
+    // TELEGRAM_BOT_TOKEN_THERAPIST is that bot's token — used for initData validation.
+    // TELEGRAM_BOT_TOKEN_CLIENT is a separate bot used only for sending client notifications.
+    const validationToken = process.env.TELEGRAM_BOT_TOKEN_THERAPIST;
 
-    if (!botToken) {
-      console.error(`Missing env var for role: ${role}`);
-      return NextResponse.json({ error: `Bot token not configured for role: ${role}` }, { status: 500 });
+    if (!validationToken) {
+      console.error('Missing TELEGRAM_BOT_TOKEN_THERAPIST');
+      return NextResponse.json({ error: 'Bot token not configured' }, { status: 500 });
     }
 
     // Validate signature (skip in development for local testing)
     if (process.env.NODE_ENV !== 'development') {
-      console.log('[auth] role:', role, '| token prefix:', botToken.slice(0, 8), '| initData length:', initData.length);
-      validateInitData(initData, botToken);
+      validateInitData(initData, validationToken);
     }
 
     // Parse user from initData
