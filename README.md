@@ -1,6 +1,6 @@
 # Canet - Telegram-Native Service Booking with TON Payments
 
-Canet is a Telegram Mini App that enables anyone to offer services through bofokable time slots and receive payments in TON, directly inside Telegram.
+Canet is a Telegram Mini App that enables anyone to offer services through bookable time slots and receive payments in TON, directly inside Telegram.
 
 ### Vision
 
@@ -10,7 +10,7 @@ Launch the marketplace here: https://t.me/canette_marketplace_bot
 
 ### Overview
 
-Canetf transforms Telegram into a native service marketplace by combining scheduling and on-chain payments. Service providers can publish availability, and clients can instantly book and pay without leaving the chat environment.
+**Canet** transforms Telegram into a native service marketplace by combining scheduling and on-chain payments. Service providers can publish availability, and clients can instantly book and pay without leaving the chat environment.
 
 ### How It Works
 
