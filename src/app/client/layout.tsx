@@ -4,7 +4,7 @@ import { ClientShell } from "./ClientShell";
 
 export default function ClientLayout({ children }: PropsWithChildren) {
   return (
-    <Providers role="client">
+  <Providers role="client">
       <ClientShell>
         <div>{children}</div>
       </ClientShell>

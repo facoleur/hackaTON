@@ -31,34 +31,43 @@ export function ClientShell({ children }: PropsWithChildren) {
   }, [isRoot, router]);
 
   return (
-    <div className="flex flex-col overflow-hidden bg-slate-100 safe-botton-zone-2">
-      <Header />
-      <div className={cn("flex-1 overflow-x-hidden overflow-y-auto", !tabbarHidden && "mb-safe-bottom")}>
-        {children}
-      </div>
-      {!tabbarHidden && <nav className="bg-card border-border fixed right-0 bottom-0 left-0 border-t">
-        <div className="flex bg-white safe-botton-zone">
-          {tabs.map((tab) => {
-            const active =
-              tab.path === "/client"
-                ? pathname === "/client"
-                : pathname.startsWith(tab.path);
-            return (
-              <button
-                key={tab.path}
-                onClick={() => router.push(tab.path)}
-                className={cn(
-                  "flex flex-1 cursor-pointer flex-col items-center gap-1 border-none bg-transparent py-2 text-xs",
-                  active ? "text-primary" : "text-muted-foreground",
-                )}
-              >
-                <span className="text-xl">{tab.icon}</span>
-                {tab.label}
-              </button>
-            );
-          })}
+    <div className="safe-botton-zone-2">
+      <div className="flex flex-col overflow-hidden bg-slate-100">
+        <Header />
+        <div
+          className={cn(
+            "flex-1 overflow-x-hidden overflow-y-auto",
+            !tabbarHidden && "mb-safe-bottom",
+          )}
+        >
+          {children}
         </div>
-      </nav>}
+        {!tabbarHidden && (
+          <nav className="border-border fixed right-0 bottom-0 left-0 z-50 p-4 pb-12">
+            <div className="bg-card/70 flex rounded-full p-1 shadow-2xl! backdrop-blur-lg">
+              {tabs.map((tab) => {
+                const active =
+                  tab.path === "/client"
+                    ? pathname === "/client"
+                    : pathname.startsWith(tab.path);
+                return (
+                  <button
+                    key={tab.path}
+                    onClick={() => router.push(tab.path)}
+                    className={cn(
+                      "flex flex-1 cursor-pointer flex-col items-center gap-1 rounded-full border-none bg-transparent py-2 text-xs",
+                      active ? "bg-slate-500/25" : "text-muted-foreground",
+                    )}
+                  >
+                    <span className="text-xl">{tab.icon}</span>
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+        )}
+      </div>
     </div>
   );
 }

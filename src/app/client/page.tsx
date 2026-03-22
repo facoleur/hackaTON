@@ -44,7 +44,7 @@ export default function BrowsePage() {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 px-3 py-4">
+    <div className="grid grid-cols-2 gap-2 px-3 py-4">
       {therapists.map((t) => (
         <TherapistCard
           key={t.id}

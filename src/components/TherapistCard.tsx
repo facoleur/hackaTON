@@ -1,7 +1,7 @@
 "use client";
 
-import type { TherapistProfile } from "@/lib/types";
 import { useImageSlider } from "@/hooks/useImageSlider";
+import type { TherapistProfile } from "@/lib/types";
 
 interface TherapistCardProps {
   therapist: TherapistProfile;
@@ -25,7 +25,7 @@ export function TherapistCard({
 
   return (
     <div
-      className="relative w-full rounded-2xl overflow-hidden shadow-lg cursor-pointer select-none"
+      className="relative w-full cursor-pointer overflow-hidden rounded-xl select-none"
       style={{ aspectRatio: "3/4" }}
       onClick={onClick}
     >
@@ -34,19 +34,19 @@ export function TherapistCard({
         {photos.length > 0 ? (
           <div className="flex h-full">
             {photos.map((src, idx) => (
-              <div key={idx} className="shrink-0 w-full h-full">
+              <div key={idx} className="h-full w-full shrink-0">
                 <img
                   src={src}
                   alt={therapist.display_name}
-                  className="w-full h-full object-cover"
+                  className="h-full w-full object-cover"
                   draggable={false}
                 />
               </div>
             ))}
           </div>
         ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            <span className="text-6xl font-bold text-muted-foreground/30">
+          <div className="bg-muted flex h-full w-full items-center justify-center">
+            <span className="text-muted-foreground/30 text-6xl font-bold">
               {therapist.display_name.charAt(0)}
             </span>
           </div>
@@ -55,7 +55,7 @@ export function TherapistCard({
 
       {/* Dot indicators */}
       {hasMultiple && (
-        <div className="absolute top-3 left-0 right-0 flex justify-center gap-1.5 z-20 px-4">
+        <div className="absolute top-3 right-0 left-0 z-20 flex justify-center gap-1.5 px-4">
           {photos.map((_, idx) => (
             <button
               key={idx}
@@ -76,7 +76,7 @@ export function TherapistCard({
 
       {/* Bottom gradient overlay */}
       <div
-        className="absolute inset-x-0 bottom-0  px-4 pb-4 pt-16"
+        className="absolute inset-x-0 bottom-0 px-4 pt-16 pb-4"
         style={{
           background:
             "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.35) 60%, transparent 100%)",
@@ -84,14 +84,11 @@ export function TherapistCard({
       >
         {/* Name + age */}
         <div className="flex items-baseline gap-2">
-          <span
-            className="text-white font-bold leading-tight"
-            style={{ fontSize: "1.35rem", letterSpacing: "-0.01em" }}
-          >
+          <span className="text-xl leading-tight font-semibold text-white">
             {therapist.display_name}
           </span>
           {therapist.age != null && (
-            <span className="text-white/80 font-medium text-lg">
+            <span className="text-lg font-medium text-white/70">
               {therapist.age}
             </span>
           )}
@@ -99,20 +96,23 @@ export function TherapistCard({
 
         {/* Rating */}
         {therapist.rating != null && (
-          <div className="flex items-center gap-1 mt-0.5">
+          <div className="mt-0.5 flex items-center gap-1">
             <svg
               width="13"
               height="13"
               viewBox="0 0 24 24"
-              fill="#facc15"
-              className="shrink-0"
+              fill="#ffffff"
+              className="text-muted shrink-0 opacity-40"
             >
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              <path
+                fill="#ffffff"
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
             </svg>
-            <span className="text-white/90 text-sm font-medium">
+            <span className="text-sm font-normal text-white/60">
               {therapist.rating.toFixed(1)}
               {reviewCount != null && (
-                <span className="text-white/60 font-normal">
+                <span className="font-normal text-white/60">
                   {" "}
                   · {reviewCount} avis
                 </span>
@@ -123,7 +123,7 @@ export function TherapistCard({
 
         {/* Location */}
         {therapist.location_name && (
-          <div className="flex items-center gap-1 mt-0.5">
+          <div className="mt-0.5 flex items-center gap-1">
             <svg
               width="11"
               height="11"
@@ -138,7 +138,7 @@ export function TherapistCard({
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
               <circle cx="12" cy="10" r="3" />
             </svg>
-            <span className="text-white/65 text-xs">
+            <span className="text-xs text-white/65">
               {therapist.location_name}
             </span>
           </div>

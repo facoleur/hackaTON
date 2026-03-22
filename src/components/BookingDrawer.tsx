@@ -31,7 +31,10 @@ export function BookingDrawer({
   const bookAndPay = useBookAndPay();
   const bookedSet = useTherapistBookedDates(therapist.id);
 
-  const [selected, setSelected] = useState<{ slotId: string; date: string } | null>(null);
+  const [selected, setSelected] = useState<{
+    slotId: string;
+    date: string;
+  } | null>(null);
   const [step, setStep] = useState<"form" | "success">("form");
   const [txHash, setTxHash] = useState<string | null>(null);
   const [multiplier, setMultiplier] = useState(1);
@@ -45,7 +48,7 @@ export function BookingDrawer({
   );
 
   const selectedSlot = selected
-    ? slots.find((s) => s.id === selected.slotId) ?? null
+    ? (slots.find((s) => s.id === selected.slotId) ?? null)
     : null;
 
   async function handlePaymentSuccess(boc: string) {
@@ -101,9 +104,12 @@ export function BookingDrawer({
                           try {
                             hapticFeedback.impactOccurred("light");
                           } catch {}
-                          setSelected({ slotId: item.slot.id, date: item.date });
+                          setSelected({
+                            slotId: item.slot.id,
+                            date: item.date,
+                          });
                         }}
-                        className="flex w-full items-center rounded-xl border px-4 py-3 text-sm transition-colors"
+                        className="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors"
                         style={{
                           borderColor: active
                             ? "var(--primary)"
@@ -114,10 +120,10 @@ export function BookingDrawer({
                           color: active
                             ? "var(--primary)"
                             : "var(--foreground)",
-                          fontWeight: active ? 600 : 400,
                         }}
                       >
-                        {item.label}
+                        <span className="font-medium">{item.label.split(" · ")[0]}</span>
+                        <span className="font-normal text-muted-foreground">{item.label.split(" · ")[1]}</span>
                       </button>
                     );
                   })}
@@ -134,7 +140,10 @@ export function BookingDrawer({
                 base={therapist.duration_minutes}
                 max={therapist.max_multiplier ?? 3}
                 value={multiplier}
-                onChange={(m) => { setMultiplier(m); setSelected(null); }}
+                onChange={(m) => {
+                  setMultiplier(m);
+                  setSelected(null);
+                }}
               />
             </div>
 
