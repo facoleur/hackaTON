@@ -49,16 +49,21 @@ export function useProfileForm() {
 
   async function onSubmit(values: ProfileFormValues) {
     try { hapticFeedback.impactOccurred("medium"); } catch {}
-    await upsert.mutateAsync({
-      display_name: values.display_name,
-      bio: values.bio || null,
-      price_ton: parseFloat(values.price_ton),
-      duration_minutes: parseInt(values.duration_minutes),
-      upfront_percent: Math.min(100, Math.max(10, parseInt(values.upfront_percent))),
-      location_name: values.location_name || null,
-      is_active: values.is_active,
-    });
-    try { hapticFeedback.notificationOccurred("success"); } catch {}
+    try {
+      await upsert.mutateAsync({
+        display_name: values.display_name,
+        bio: values.bio || null,
+        price_ton: parseFloat(values.price_ton),
+        duration_minutes: parseInt(values.duration_minutes),
+        upfront_percent: Math.min(100, Math.max(10, parseInt(values.upfront_percent))),
+        location_name: values.location_name || null,
+        is_active: values.is_active,
+      });
+      try { hapticFeedback.notificationOccurred("success"); } catch {}
+    } catch (err: unknown) {
+      const e = err as Record<string, unknown>;
+      console.error("[ProfileForm] save failed:", JSON.stringify(e), { code: e?.code, message: e?.message, details: e?.details, hint: e?.hint });
+    }
   }
 
   return { form, profile, isLoading, upsert, onSubmit };

@@ -2,16 +2,18 @@
 
 import { OnboardingFlow } from "@/app/therapist/onboarding/OnboardingFlow";
 import { useMyProfile } from "@/hooks/useProfile";
+import { useTelegramUser } from "@/hooks/useTelegramUser";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { TonConnectButton } from "@tonconnect/ui-react";
 import { backButton } from "@tma.js/sdk-react";
 import { usePathname, useRouter } from "next/navigation";
 import { type PropsWithChildren, useEffect, useState } from "react";
 
 const tabs = [
   { path: "/therapist", label: "Dashboard", icon: "📅" },
-  { path: "/therapist/profile", label: "Profile", icon: "👤" },
   { path: "/therapist/availability", label: "Schedule", icon: "🕐" },
+  { path: "/therapist/profile", label: "Profile", icon: "👤" },
 ];
 
 function Spinner() {
@@ -19,6 +21,26 @@ function Spinner() {
     <div className="flex min-h-screen items-center justify-center">
       <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
     </div>
+  );
+}
+
+function TherapistHeader() {
+  const user = useTelegramUser();
+  const displayName = user
+    ? user.username
+      ? `@${user.username}`
+      : user.first_name
+    : null;
+
+  return (
+    <header className="bg-background border-border sticky top-0 z-20 flex items-center justify-between border-b px-4 py-2">
+      {displayName ? (
+        <span className="text-sm font-medium">{displayName}</span>
+      ) : (
+        <span />
+      )}
+      <TonConnectButton />
+    </header>
   );
 }
 
@@ -55,8 +77,9 @@ export function TherapistShell({ children }: PropsWithChildren) {
 
   return (
     <OnboardingGate>
-      <div className="flex flex-col overflow-hidden bg-slate-100">
-        <div className="mx-2 flex-1 overflow-x-hidden overflow-y-auto">
+      <div className="flex min-h-screen flex-col bg-slate-100">
+        <TherapistHeader />
+        <div className="mx-2 flex-1 overflow-x-hidden overflow-y-auto pb-16">
           {children}
         </div>
         <nav className="bg-card border-border fixed right-0 bottom-0 left-0 border-t">

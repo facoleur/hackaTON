@@ -1,5 +1,9 @@
 "use client";
 
+import { useDidMount } from "@/hooks/useDidMount";
+import { getSupabaseClient } from "@/lib/supabase-client";
+import type { Role } from "@/lib/types";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   initData,
@@ -10,11 +14,6 @@ import {
 } from "@tma.js/sdk-react";
 import { TonConnectUIProvider, useTonWallet } from "@tonconnect/ui-react";
 import { type PropsWithChildren, useEffect, useRef } from "react";
-
-import { useDidMount } from "@/hooks/useDidMount";
-import { getSupabaseClient } from "@/lib/supabase-client";
-import type { Role } from "@/lib/types";
-import { useAuthStore } from "@/stores/useAuthStore";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,14 +49,18 @@ function AuthInit({ role }: { role: Role }) {
 
 function WalletSync() {
   const wallet = useTonWallet();
+  const address = wallet?.account?.address ?? null;
   const setWalletAddress = useAuthStore((s) => s.setWalletAddress);
   const token = useAuthStore((s) => s.supabaseToken);
   const userId = useAuthStore((s) => s.telegramUser?.id);
 
+  // Sync address into store whenever it changes
   useEffect(() => {
-    const address = wallet?.account?.address ?? null;
     setWalletAddress(address);
+  }, [address, setWalletAddress]);
 
+  // Persist to DB — runs when address OR auth credentials become available
+  useEffect(() => {
     if (!token || !userId) return;
 
     const supabase = getSupabaseClient(token);
@@ -66,10 +69,11 @@ function WalletSync() {
       .update({ wallet_address: address })
       .eq("id", userId)
       .then(({ error }) => {
-        if (error) console.error("[WalletSync] failed to persist wallet", error);
+        if (error)
+          console.error("[WalletSync] failed to persist wallet", error);
         else console.log("[WalletSync] wallet persisted", address);
       });
-  }, [wallet, setWalletAddress, token, userId]);
+  }, [address, token, userId]);
 
   return null;
 }

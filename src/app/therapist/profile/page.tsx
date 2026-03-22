@@ -2,9 +2,13 @@
 
 import { useProfileForm } from "@/app/therapist/hooks/useProfileForm";
 import { FormField, FormSection } from "@/components/Form";
+import { TherapistPhotoManager } from "@/components/TherapistPhotoManager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { Address } from "@ton/core";
+import { useTonConnectUI } from "@tonconnect/ui-react";
 
 function Spinner() {
   return (
@@ -20,6 +24,8 @@ function Spinner() {
 
 export default function ProfilePage() {
   const { form, profile, isLoading, upsert, onSubmit } = useProfileForm();
+  const walletAddress = useAuthStore((s) => s.walletAddress);
+  const [tonConnectUI] = useTonConnectUI();
   const {
     register,
     handleSubmit,
@@ -47,6 +53,28 @@ export default function ProfilePage() {
             placeholder="City, neighborhood..."
             {...register("location_name")}
           />
+        </FormField>
+      </FormSection>
+
+      <FormSection title="Wallet">
+        <FormField label="TON address">
+          {walletAddress ? (
+            <div className="bg-muted flex items-center justify-between gap-2 rounded-lg px-3 py-2">
+              <span className="font-mono text-sm font-medium">
+                {Address.parse(walletAddress).toString({ urlSafe: true, bounceable: false })}
+              </span>
+              <span className="text-muted-foreground text-xs">Connected</span>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => tonConnectUI.openModal()}
+            >
+              Connect Wallet
+            </Button>
+          )}
         </FormField>
       </FormSection>
 
@@ -78,16 +106,18 @@ export default function ProfilePage() {
       </FormSection>
 
       <FormSection title="Visibility">
-        <label className="flex cursor-pointer items-center justify-between py-1 font-medium">
-          <span className="text-foreground text-sm">
+        <div className="flex items-center justify-between py-1">
+          <span className="text-foreground text-sm font-medium">
             Active (visible to clients)
           </span>
           <Switch
             checked={watch("is_active")}
             onCheckedChange={(val) => setValue("is_active", val)}
           />
-        </label>
+        </div>
       </FormSection>
+
+      <TherapistPhotoManager />
 
       <Button
         type="submit"

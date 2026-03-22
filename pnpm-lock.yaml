@@ -41,6 +41,9 @@ importers:
       '@tma.js/sdk-react':
         specifier: ^3.0.11
         version: 3.0.11(@types/react@19.2.7)(react@19.2.0)(typescript@5.9.3)
+      '@ton/core':
+        specifier: ^0.63.1
+        version: 0.63.1(@ton/crypto@3.3.0)
       '@tonconnect/ui-react':
         specifier: ^2.3.1
         version: 2.3.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -1241,6 +1244,17 @@ packages:
   '@tma.js/types@1.0.2':
     resolution: {integrity: sha512-qs4mi+U1xZmMQBdMhWAo1X4YqUJ/ae0y28s+GNCpQq58bsJo0h8rvyVOB1RwPvXogIY9+yribbZe6z3AIJmsAQ==}
 
+  '@ton/core@0.63.1':
+    resolution: {integrity: sha512-hDWMjlKzc18W2E4OeV3hUP8ohRJNHPD4Wd1+AQJj8zshZyCRT0usrvnExgbNUTo/vntDqCGMzgYWbXxyaA+L4g==}
+    peerDependencies:
+      '@ton/crypto': '>=3.2.0'
+
+  '@ton/crypto-primitives@2.1.0':
+    resolution: {integrity: sha512-PQesoyPgqyI6vzYtCXw4/ZzevePc4VGcJtFwf08v10OevVJHVfW238KBdpj1kEDQkxWLeuNHEpTECNFKnP6tow==}
+
+  '@ton/crypto@3.3.0':
+    resolution: {integrity: sha512-/A6CYGgA/H36OZ9BbTaGerKtzWp50rg67ZCH2oIjV1NcrBaCK9Z343M+CxedvM7Haf3f/Ee9EhxyeTp0GKMUpA==}
+
   '@tonconnect/isomorphic-eventsource@0.0.2':
     resolution: {integrity: sha512-B4UoIjPi0QkvIzZH5fV3BQLWrqSYABdrzZQSI9sJA9aA+iC0ohOzFwVVGXanlxeDAy1bcvPbb29f6sVUk0UnnQ==}
 
@@ -2264,6 +2278,9 @@ packages:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
     hasBin: true
+
+  jssha@3.2.0:
+    resolution: {integrity: sha512-QuruyBENDWdN4tZwJbQq7/eAK85FqrI4oDbXjy5IBhYD+2pTJyBUWZe8ctWaCkrV0gy6AaelgOZZBMeswEa/6Q==}
 
   jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
@@ -4071,6 +4088,20 @@ snapshots:
 
   '@tma.js/types@1.0.2': {}
 
+  '@ton/core@0.63.1(@ton/crypto@3.3.0)':
+    dependencies:
+      '@ton/crypto': 3.3.0
+
+  '@ton/crypto-primitives@2.1.0':
+    dependencies:
+      jssha: 3.2.0
+
+  '@ton/crypto@3.3.0':
+    dependencies:
+      '@ton/crypto-primitives': 2.1.0
+      jssha: 3.2.0
+      tweetnacl: 1.0.3
+
   '@tonconnect/isomorphic-eventsource@0.0.2':
     dependencies:
       eventsource: 2.0.2
@@ -5420,6 +5451,8 @@ snapshots:
       minimist: 1.2.8
 
   json5@2.2.3: {}
+
+  jssha@3.2.0: {}
 
   jsx-ast-utils@3.3.5:
     dependencies:

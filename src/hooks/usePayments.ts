@@ -44,16 +44,34 @@ export function useRateAndPayFinal() {
     mutationFn: async ({
       bookingId,
       rating,
-      review,
     }: {
       bookingId: string;
       rating: number;
-      review?: string;
     }) => {
       const supabase = getSupabaseClient(token);
       const { error } = await supabase
         .from('bookings')
-        .update({ rating, review: review ?? null })
+        .update({ rating, review: null })
+        .eq('id', bookingId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.bookings.all() });
+    },
+  });
+}
+
+export function useCancelRating() {
+  const token = useAuthStore((s) => s.supabaseToken);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ bookingId }: { bookingId: string }) => {
+      const supabase = getSupabaseClient(token);
+      const { error } = await supabase
+        .from('bookings')
+        .update({ rating: null, review: null })
         .eq('id', bookingId);
 
       if (error) throw error;
