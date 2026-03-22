@@ -38,7 +38,12 @@ export function PayButton({
   });
 
   async function handlePay() {
-    console.log("[PayButton] clicked", { wallet: !!wallet, therapistWallet, amountTon, disabled });
+    console.log("[PayButton] clicked", {
+      wallet: !!wallet,
+      therapistWallet,
+      amountTon,
+      disabled,
+    });
 
     try {
       hapticFeedback.impactOccurred("medium");
