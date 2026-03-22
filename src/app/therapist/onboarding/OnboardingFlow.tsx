@@ -3,7 +3,6 @@
 import { FormField, FormSection } from "@/components/Form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useUpsertProfile } from "@/hooks/useProfile";
 import { getSupabaseClient } from "@/lib/supabase-client";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -44,7 +43,7 @@ export function OnboardingFlow({ onDone }: OnboardingFlowProps) {
       <div className="mb-8 text-center">
         <h1 className="text-xl font-bold">Set up your profile</h1>
         <p className="text-muted-foreground mt-1 text-sm">Step {stepLabel}</p>
-        <div className="mt-3 flex gap-1.5 justify-center">
+        <div className="mt-3 flex justify-center gap-1.5">
           {(["wallet", "info", "photos"] as Step[]).map((s) => (
             <div
               key={s}
@@ -85,7 +84,9 @@ function WalletStep() {
       </div>
       {wallet ? (
         <div className="bg-card w-full rounded-xl p-4 text-center">
-          <p className="text-sm font-medium text-green-600">Wallet connected!</p>
+          <p className="text-sm font-medium text-green-600">
+            Wallet connected!
+          </p>
           <p className="text-muted-foreground mt-1 font-mono text-xs">
             {wallet.account.address.slice(0, 8)}…
             {wallet.account.address.slice(-6)}
@@ -142,7 +143,7 @@ function InfoStep({ onNext }: { onNext: () => void }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <FormSection title="About You">
+      <FormSection>
         <FormField label="Name *" error={errors.display_name}>
           <Input
             placeholder="e.g. Maria"
@@ -175,7 +176,7 @@ function InfoStep({ onNext }: { onNext: () => void }) {
         </FormField>
       </FormSection>
 
-      <FormSection title="Pricing">
+      <FormSection>
         <FormField label="Price per session (TON)" error={errors.price_ton}>
           <Input
             type="number"
@@ -247,9 +248,7 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
           .from("canettes")
           .upload(path, file);
         if (uploadError) throw uploadError;
-        const { data } = supabase.storage
-          .from("canettes")
-          .getPublicUrl(path);
+        const { data } = supabase.storage.from("canettes").getPublicUrl(path);
         urls.push(data.publicUrl);
       }
 
@@ -259,9 +258,7 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
       } catch {}
       onDone();
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "Upload failed, try again",
-      );
+      setError(err instanceof Error ? err.message : "Upload failed, try again");
     } finally {
       setUploading(false);
     }

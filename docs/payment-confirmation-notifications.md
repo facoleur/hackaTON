@@ -190,6 +190,179 @@ No new env vars needed.
 
 | File | Action |
 |---|---|
-| `src/lib/telegram.ts` | Add `sendTelegramMessage()` |
+| `src/lib/telegram.ts` | Add `sendTelegramMessage()` and `sendTelegramInlineKeyboard()` |
 | `src/app/api/notifications/payment-confirmed/route.ts` | Create new API route |
 | `src/hooks/usePayments.ts` | Call the route after successful payment mutations |
+
+---
+
+## Extension A — 24h Session Reminder
+
+### Feasibility: easy
+
+**Vercel plan note:** Hobby plan supports daily crons only (`0 8 * * *` = every day at 8am UTC). This is fine — the query uses `booking_date = tomorrow` which is a full-day match, so the exact hour the cron fires doesn't matter much. Clients get their reminder sometime that morning.
+
+### DB change
+
+```sql
+ALTER TABLE bookings ADD COLUMN reminded_24h boolean NOT NULL DEFAULT false;
+```
+
+### Trigger
+
+Vercel cron runs **daily at 8am UTC**. Route queries bookings where:
+- `status IN ('confirmed', 'fully_paid')`
+- `booking_date = CURRENT_DATE + 1` (session is tomorrow)
+- `reminded_24h = false`
+
+Marks `reminded_24h = true` after sending.
+
+### `vercel.json`
+
+```json
+{
+  "crons": [{ "path": "/api/cron/reminders", "schedule": "0 8 * * *" }]
+}
+```
+
+### Message templates
+
+**Client:**
+```
+⏰ Reminder: session tomorrow
+
+Your session with {therapist_display_name} is tomorrow.
+📅 {booking_date} at {start_time} · {duration_minutes} min
+```
+
+**Therapist:**
+```
+⏰ Reminder: session tomorrow
+
+You have a session with {client_first_name} tomorrow.
+📅 {booking_date} at {start_time} · {duration_minutes} min
+```
+
+### Files
+
+| File | Action |
+|---|---|
+| `src/app/api/cron/reminders/route.ts` | New cron route |
+| `vercel.json` | Add cron schedule |
+
+---
+
+## Extension B — Post-session Review Request (with inline buttons)
+
+### Feasibility: moderate
+
+**Vercel plan note:** Same daily cron handles this. The query checks `booking_date = CURRENT_DATE - 1` (session was yesterday). Review requests go out the morning after the session — clean, no time arithmetic needed.
+
+Scheduling is trivial (same daily cron). Rating buttons require Telegram **callback queries** and a registered webhook on the client bot.
+
+### How Telegram inline buttons work
+
+1. Bot sends a message with an `InlineKeyboardMarkup` — buttons embedded in the message
+2. User taps a button → Telegram POSTs a `callback_query` to your registered webhook URL
+3. Your webhook route handles it: reads `callback_data` (encodes `bookingId:rating`), updates the DB, calls `answerCallbackQuery` to dismiss the spinner
+4. Only the **client bot** needs a webhook (only clients rate sessions)
+
+### Register the webhook (one-time, after deploy)
+
+```bash
+curl -X POST "https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN_CLIENT}/setWebhook" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://your-domain.com/api/telegram/webhook", "allowed_updates": ["callback_query"]}'
+```
+
+### DB change
+
+```sql
+ALTER TABLE bookings ADD COLUMN review_requested boolean NOT NULL DEFAULT false;
+```
+
+### Trigger
+
+Same daily cron. Additional query: bookings where:
+- `status IN ('fully_paid', 'completed')`
+- `booking_date = CURRENT_DATE - 1` (session was yesterday)
+- `review_requested = false`
+
+### `sendTelegramInlineKeyboard` (new function in `telegram.ts`)
+
+```ts
+export async function sendTelegramInlineKeyboard(
+  botToken: string,
+  chatId: number,
+  text: string,
+  buttons: { text: string; callback_data: string }[]
+): Promise<void>
+// Calls POST /sendMessage with reply_markup.inline_keyboard
+```
+
+### Review request message (client only)
+
+```
+⭐ How was your session?
+
+Rate your session with {therapist_display_name}:
+```
+
+Inline keyboard row:
+```
+[ 1 ★ ]  [ 2 ★ ]  [ 3 ★ ]  [ 4 ★ ]  [ 5 ★ ]
+```
+
+`callback_data` per button: `"rate:{bookingId}:{rating}"` (e.g. `"rate:abc-123:4"`)
+
+### Webhook handler (`/api/telegram/webhook`)
+
+```
+POST /api/telegram/webhook
+Body: Telegram Update object (no auth — Telegram sends this directly)
+```
+
+Logic:
+1. Check `update.callback_query` exists
+2. Parse `callback_data`: split on `:` → `[action, bookingId, rating]`
+3. If `action === 'rate'`: update `bookings.rating = rating` where `id = bookingId`
+4. Call `answerCallbackQuery` with the callback query id (required to dismiss button spinner)
+5. Edit the original message to confirm: `"✅ Thanks for your rating!"`
+
+### Files
+
+| File | Action |
+|---|---|
+| `src/app/api/cron/reminders/route.ts` | Add review request logic alongside 24h reminder |
+| `src/app/api/telegram/webhook/route.ts` | New — handles callback_query from inline buttons |
+| `src/lib/telegram.ts` | Add `sendTelegramInlineKeyboard()` and `answerCallbackQuery()` |
+
+---
+
+## Full Files Summary
+
+| File | Action |
+|---|---|
+| `src/lib/telegram.ts` | Add `sendTelegramMessage()`, `sendTelegramInlineKeyboard()`, `answerCallbackQuery()` |
+| `src/app/api/notifications/payment-confirmed/route.ts` | New — payment confirmation |
+| `src/app/api/cron/reminders/route.ts` | New — daily reminder + review request (runs at 8am UTC) |
+| `src/app/api/telegram/webhook/route.ts` | New — callback_query handler for star ratings |
+| `src/hooks/usePayments.ts` | Call payment-confirmed route after mutations |
+| `vercel.json` | Add daily cron `0 8 * * *` |
+
+## DB changes (all three features)
+
+```sql
+ALTER TABLE bookings ADD COLUMN reminded_24h boolean NOT NULL DEFAULT false;
+ALTER TABLE bookings ADD COLUMN review_requested boolean NOT NULL DEFAULT false;
+```
+
+## Outside-codebase checklist
+
+| Step | Where | When |
+|------|-------|------|
+| Run 2 SQL migrations above | Supabase SQL editor | Before deploy |
+| Confirm `CRON_SECRET` env var exists | Vercel → Settings → Env Vars | Before deploy |
+| Deploy with `vercel.json` cron config | Vercel | Deploy |
+| Register client bot webhook (1 curl) | Terminal | After deploy |
+| Verify webhook: `getWebhookInfo` | Terminal | After deploy |

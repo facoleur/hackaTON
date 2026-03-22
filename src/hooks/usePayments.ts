@@ -5,6 +5,17 @@ import { getSupabaseClient } from '@/lib/supabase-client';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { queryKeys } from '@/lib/query-keys';
 
+function notifyPayment(token: string | null, bookingId: string, event: 'upfront' | 'final') {
+  fetch('/api/notifications/payment-confirmed', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ bookingId, event }),
+  }).catch(console.error);
+}
+
 export function usePay() {
   const token = useAuthStore((s) => s.supabaseToken);
   const queryClient = useQueryClient();
@@ -27,6 +38,7 @@ export function usePay() {
         .eq('id', bookingId);
 
       if (error) throw error;
+      notifyPayment(token, bookingId, 'final');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bookings.all() });

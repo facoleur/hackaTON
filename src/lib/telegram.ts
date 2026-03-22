@@ -41,6 +41,59 @@ export function validateInitData(
   return result;
 }
 
+export async function sendTelegramMessage(
+  botToken: string,
+  chatId: number,
+  text: string,
+): Promise<void> {
+  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, text }),
+  });
+}
+
+export async function sendTelegramInlineKeyboard(
+  botToken: string,
+  chatId: number,
+  text: string,
+  buttons: { text: string; callback_data: string }[],
+): Promise<void> {
+  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text,
+      reply_markup: { inline_keyboard: [buttons] },
+    }),
+  });
+}
+
+export async function answerCallbackQuery(
+  botToken: string,
+  callbackQueryId: string,
+): Promise<void> {
+  await fetch(`https://api.telegram.org/bot${botToken}/answerCallbackQuery`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ callback_query_id: callbackQueryId }),
+  });
+}
+
+export async function editTelegramMessage(
+  botToken: string,
+  chatId: number,
+  messageId: number,
+  text: string,
+): Promise<void> {
+  await fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, message_id: messageId, text }),
+  });
+}
+
 export function parseInitDataUser(initData: string): {
   id: number;
   first_name: string;

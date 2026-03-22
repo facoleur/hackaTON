@@ -38,7 +38,7 @@ export default function ProfilePage() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
-      <FormSection title="Basic Info">
+      <FormSection>
         <FormField label="Display name" error={errors.display_name}>
           <Input placeholder="Your name" {...register("display_name")} />
         </FormField>
@@ -56,12 +56,18 @@ export default function ProfilePage() {
         </FormField>
       </FormSection>
 
-      <FormSection >
+      <FormSection>
         <FormField label="TON address">
           {walletAddress ? (
             <div className="bg-muted flex items-center justify-between gap-2 rounded-lg px-3 py-2">
               <span className="font-mono text-sm font-medium">
-                {(() => { const a = Address.parse(walletAddress).toString({ urlSafe: true, bounceable: false }); return `${a.slice(0, 6)}...${a.slice(-6)}`; })()}
+                {(() => {
+                  const a = Address.parse(walletAddress).toString({
+                    urlSafe: true,
+                    bounceable: false,
+                  });
+                  return `${a.slice(0, 6)}...${a.slice(-6)}`;
+                })()}
               </span>
               <span className="text-muted-foreground text-xs">Connected</span>
             </div>
@@ -78,7 +84,7 @@ export default function ProfilePage() {
         </FormField>
       </FormSection>
 
-      <FormSection title="Pricing & Duration">
+      <FormSection>
         <FormField label="Price (TON)" error={errors.price_ton}>
           <Input
             type="number"
@@ -105,7 +111,7 @@ export default function ProfilePage() {
         </FormField>
       </FormSection>
 
-      <FormSection >
+      <FormSection>
         <div className="flex items-center justify-between py-1">
           <span className="text-foreground text-sm font-medium">
             Active (visible to clients)
