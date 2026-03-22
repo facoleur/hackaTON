@@ -14,7 +14,7 @@ export default function Home() {
         onClick={() => router.push("/therapist")}
       >
         <span className="text-7xl font-bold tracking-tight text-black">
-          I&apos;m a therapist
+          I want to earn money
         </span>
       </button>
 
@@ -25,7 +25,7 @@ export default function Home() {
         onClick={() => router.push("/client")}
       >
         <span className="text-7xl font-bold tracking-tight text-stone-800">
-          Book a massage
+          Book a service
         </span>
       </button>
 
