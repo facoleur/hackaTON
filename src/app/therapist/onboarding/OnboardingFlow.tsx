@@ -7,6 +7,7 @@ import { useUpsertProfile } from "@/hooks/useProfile";
 import { getSupabaseClient } from "@/lib/supabase-client";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { hapticFeedback } from "@tma.js/sdk-react";
+import { Address } from "@ton/core";
 import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -88,8 +89,13 @@ function WalletStep() {
             Wallet connected!
           </p>
           <p className="text-muted-foreground mt-1 font-mono text-xs">
-            {wallet.account.address.slice(0, 8)}…
-            {wallet.account.address.slice(-6)}
+            {(() => {
+              const a = Address.parse(wallet.account.address).toString({
+                urlSafe: true,
+                bounceable: false,
+              });
+              return `${a.slice(0, 8)}…${a.slice(-6)}`;
+            })()}
           </p>
         </div>
       ) : (
@@ -113,10 +119,10 @@ function InfoStep({ onNext }: { onNext: () => void }) {
     formState: { errors, isValid },
   } = useForm<InfoFormValues>({
     defaultValues: {
-      display_name: "",
-      age: "",
+      display_name: "Luca",
+      age: "25",
       bio: "",
-      location_name: "",
+      location_name: "EPFL",
       price_ton: "0.5",
     },
     mode: "onChange",

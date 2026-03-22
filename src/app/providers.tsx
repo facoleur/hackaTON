@@ -13,7 +13,7 @@ import {
   useLaunchParams,
   useSignal,
 } from "@tma.js/sdk-react";
-import { toUserFriendlyAddress } from "@tonconnect/sdk";
+import { Address } from "@ton/core";
 import { TonConnectUIProvider, useTonWallet } from "@tonconnect/ui-react";
 import { type PropsWithChildren, useEffect, useRef } from "react";
 
@@ -52,7 +52,9 @@ function AuthInit({ role }: { role: Role }) {
 function WalletSync() {
   const wallet = useTonWallet();
   const rawAddress = wallet?.account?.address ?? null;
-  const address = rawAddress ? toUserFriendlyAddress(rawAddress) : null;
+  const address = rawAddress
+    ? Address.parse(rawAddress).toString({ urlSafe: true, bounceable: false })
+    : null;
   const setWalletAddress = useAuthStore((s) => s.setWalletAddress);
   const token = useAuthStore((s) => s.supabaseToken);
   const userId = useAuthStore((s) => s.telegramUser?.id);
@@ -76,7 +78,10 @@ function WalletSync() {
         if (error)
           console.error("[WalletSync] failed to persist wallet", error);
         else if (!data || data.length === 0)
-          console.error("[WalletSync] wallet update matched 0 rows — check RLS policy on users table. userId:", userId);
+          console.error(
+            "[WalletSync] wallet update matched 0 rows — check RLS policy on users table. userId:",
+            userId,
+          );
         else console.log("[WalletSync] wallet persisted", address);
       });
   }, [address, token, userId]);
@@ -128,11 +133,10 @@ export function Providers({ children, role }: ProvidersProps) {
       <TonConnectUIProvider
         manifestUrl={process.env.NEXT_PUBLIC_TONCONNECT_MANIFEST_URL!}
         actionsConfiguration={{
-          twaReturnUrl: (
-            role === "client"
-              ? process.env.NEXT_PUBLIC_CLIENT_TWA_URL!
-              : process.env.NEXT_PUBLIC_THERAPIST_TWA_URL!
-          ) as `${string}://${string}`,
+          twaReturnUrl: (role === "client"
+            ? process.env.NEXT_PUBLIC_CLIENT_TWA_URL!
+            : process.env
+                .NEXT_PUBLIC_THERAPIST_TWA_URL!) as `${string}://${string}`,
         }}
       >
         {didMount ? <AppInner role={role}>{children}</AppInner> : <AppLoader />}
