@@ -1,7 +1,82 @@
-# Telegram Mini Apps Next.js Template
+# Canet - Telegram-Native Service Booking with TON Payments
 
-This template demonstrates how developers can implement a web application on the
-Telegram Mini Apps platform using the following technologies and libraries:
+Canet is a Telegram Mini App that enables anyone to offer services through bofokable time slots and receive payments in TON, directly inside Telegram.
+
+### Vision
+
+Turn every Telegram profile into a bookable, paid service powered by TON.
+
+### Overviefw
+
+Canetf transforms Telegram into a native service marketplace by combining scheduling and on-chain payments. Service providers can publish availability, and clients can instantly book and pay without leaving the chat environment.
+
+### How It Works
+
+**Providers**
+
+- Create a service with price, duration, and optional deposit
+- Define weekly availability
+- Manage incoming bookings and mark sessions as completed
+
+**Clients**
+
+- Open the Mini App via Telegram
+- Browse services and available time slots
+- Book a slot and pay in TON
+- Complete remaining payment after the service (if split payment is used)
+
+### Payments
+
+Payments are handled via TONConnect on the TON.
+
+Two modes:
+
+- Full upfront payment
+- Split payment (deposit + final settlement)
+
+All transactions are on-chain and linked to bookings.
+
+### Booking Lifecycle
+
+available → reserved → upfront_paid → completed → fully_paid
+
+### Key Features
+
+- Time slot-based booking system
+- Telegram-native Mini App experience
+- Instant TON payments
+- Provider dashboard for availability and bookings
+- Shareable booking links inside chats
+
+### Why Telegram + TON
+
+Built on Telegram Mini Apps, Canet leverages:
+
+- Native distribution through chats and groups
+- No installation or signup friction
+- Seamless crypto payments via TON
+
+### Tech Stack
+
+- Frontend: Next.js (Telegram Mini App)
+- Backend: Supabase (PostgreSQL)
+- Payments: TONConnect
+- State: React Query, Zustand
+
+### Status
+
+Prototype with working flows:
+
+- Service creation
+- Slot selection
+- Booking
+- TON payment integration
+
+
+
+## Usage
+
+This mini APP use the following technologies and libraries:
 
 - [Next.js](https://nextjs.org/)
 - [TypeScript](https://www.typescriptlang.org/)
@@ -9,11 +84,9 @@ Telegram Mini Apps platform using the following technologies and libraries:
 - [@telegram-apps SDK](https://docs.telegram-mini-apps.com/packages/telegram-apps-sdk/2-x)
 - [Telegram UI](https://github.com/Telegram-Mini-Apps/TelegramUI)
 
-> The template was created using [pnpm](https://pnpm.io/). Therefore, it is
-> required to use it for this project as well. Using other package managers, you
-> will receive a corresponding error.
 
-## Install Dependencies
+
+### Install Dependencies
 
 If you have just cloned this template, you should install the project
 dependencies using the command:
@@ -22,7 +95,7 @@ dependencies using the command:
 pnpm install
 ```
 
-## Scripts
+### Scripts
 
 This project contains the following scripts:
 
@@ -42,13 +115,13 @@ pnpm run {script}
 # Example: pnpm run build
 ```
 
-## Create Bot and Mini App
+### Create Bot and Mini App
 
 Before you start, make sure you have already created a Telegram Bot. Here is
 a [comprehensive guide](https://docs.telegram-mini-apps.com/platform/creating-new-app)
 on how to do it.
 
-## Run
+### Run
 
 Although Mini Apps are designed to be opened
 within [Telegram applications](https://docs.telegram-mini-apps.com/platform/about#supported-applications),
@@ -124,7 +197,7 @@ Then, navigate to [https://web.telegram.org/k/](https://web.telegram.org/k/),
 find your bot, and launch the Telegram Mini App. This approach provides the full
 development experience.
 
-## Deploy
+### Deploy
 
 The easiest way to deploy your Next.js app is to use
 the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)
@@ -134,7 +207,7 @@ Check out
 the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for
 more details.
 
-## Useful Links
+### Useful Links
 
 - [Platform documentation](https://docs.telegram-mini-apps.com/)
 - [@telegram-apps/sdk-react documentation](https://docs.telegram-mini-apps.com/packages/telegram-apps-sdk-react)
