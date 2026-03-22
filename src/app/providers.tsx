@@ -1,5 +1,6 @@
 "use client";
 
+import { AppLoader } from "@/components/AppLoader";
 import { useDidMount } from "@/hooks/useDidMount";
 import { getSupabaseClient } from "@/lib/supabase-client";
 import type { Role } from "@/lib/types";
@@ -131,9 +132,7 @@ export function Providers({ children, role }: ProvidersProps) {
         {didMount ? (
           <AppInner role={role}>{children}</AppInner>
         ) : (
-          <div className="flex justify-center p-10">
-            <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
-          </div>
+          <AppLoader />
         )}
       </TonConnectUIProvider>
     </QueryClientProvider>

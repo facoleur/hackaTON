@@ -1,6 +1,7 @@
 "use client";
 
 import { BookingCard } from "@/components/BookingCard";
+import { BookingCardSkeleton } from "@/components/BookingCardSkeleton";
 import { useClientBookings } from "@/hooks/useBookings";
 import type { TherapistProfile } from "@/lib/types";
 import { useRouter } from "next/navigation";
@@ -11,8 +12,12 @@ export default function BookingsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center p-10">
-        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="py-4">
+        <div className="bg-card rounded-xl overflow-hidden divide-y divide-border mx-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <BookingCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }

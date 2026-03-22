@@ -1,6 +1,7 @@
 "use client";
 
 import { useTherapistDashboard } from "@/app/therapist/hooks/useTherapistDashboard";
+import { BookingCardSkeleton } from "@/components/BookingCardSkeleton";
 import { BookingStatusBadge } from "@/components/BookingStatusBadge";
 import { Button } from "@/components/ui/button";
 import { useAvailability } from "@/hooks/useAvailability";
@@ -118,8 +119,12 @@ export default function TherapistDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center p-10">
-        <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+      <div className="py-4">
+        <div className="bg-card rounded-xl overflow-hidden divide-y divide-border mx-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <BookingCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }

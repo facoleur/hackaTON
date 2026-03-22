@@ -1,6 +1,7 @@
 "use client";
 
 import { TherapistCard } from "@/components/TherapistCard";
+import { TherapistCardSkeleton } from "@/components/TherapistCardSkeleton";
 import { useTherapists } from "@/hooks/useTherapists";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
@@ -12,8 +13,10 @@ export default function BrowsePage() {
 
   if (!token || isLoading) {
     return (
-      <div className="flex justify-center p-10">
-        <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+      <div className="grid grid-cols-2 gap-3 px-3 py-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <TherapistCardSkeleton key={i} />
+        ))}
       </div>
     );
   }

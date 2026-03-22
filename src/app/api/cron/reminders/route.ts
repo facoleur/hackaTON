@@ -45,10 +45,13 @@ export async function GET(req: NextRequest) {
     .eq('reminded_24h', false);
 
   for (const booking of toRemind ?? []) {
-    const clientId = booking.client?.telegram_id;
-    const therapistId = booking.therapist_profiles?.therapist_user?.telegram_id;
-    const therapistName = booking.therapist_profiles?.display_name ?? 'your therapist';
-    const clientName = booking.client?.first_name ?? 'Client';
+    const client = Array.isArray(booking.client) ? booking.client[0] : booking.client;
+    const therapistProfile = Array.isArray(booking.therapist_profiles) ? booking.therapist_profiles[0] : booking.therapist_profiles;
+    const therapistUser = therapistProfile && (Array.isArray((therapistProfile as any).therapist_user) ? (therapistProfile as any).therapist_user[0] : (therapistProfile as any).therapist_user);
+    const clientId = (client as any)?.telegram_id;
+    const therapistId = (therapistUser as any)?.telegram_id;
+    const therapistName = (therapistProfile as any)?.display_name ?? 'your therapist';
+    const clientName = (client as any)?.first_name ?? 'Client';
     const time = booking.start_time?.slice(0, 5);
     const date = booking.booking_date;
     const duration = booking.duration_minutes;
@@ -84,8 +87,10 @@ export async function GET(req: NextRequest) {
     .eq('review_requested', false);
 
   for (const booking of toReview ?? []) {
-    const clientId = booking.client?.telegram_id;
-    const therapistName = booking.therapist_profiles?.display_name ?? 'your therapist';
+    const client = Array.isArray(booking.client) ? booking.client[0] : booking.client;
+    const therapistProfile = Array.isArray(booking.therapist_profiles) ? booking.therapist_profiles[0] : booking.therapist_profiles;
+    const clientId = (client as any)?.telegram_id;
+    const therapistName = (therapistProfile as any)?.display_name ?? 'your therapist';
 
     if (clientId) {
       const buttons = [1, 2, 3, 4, 5].map((n) => ({

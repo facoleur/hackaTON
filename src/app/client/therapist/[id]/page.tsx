@@ -3,6 +3,7 @@
 import { BookingDrawer } from "@/components/BookingDrawer";
 import { HideTabbar } from "@/components/HideTabbar";
 import { ImageSlider } from "@/components/ImageSlider";
+import { TherapistProfileSkeleton } from "@/components/TherapistProfileSkeleton";
 import { Button } from "@/components/ui/button";
 import { useAvailability } from "@/hooks/useAvailability";
 import { useSwipeBack } from "@/hooks/useSwipeBack";
@@ -28,11 +29,7 @@ export default function TherapistDetailPage({ params }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center p-10">
-        <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
-      </div>
-    );
+    return <TherapistProfileSkeleton />;
   }
 
   if (!therapist) {
