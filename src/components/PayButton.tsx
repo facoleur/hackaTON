@@ -11,7 +11,7 @@ import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 import { useState } from "react";
 
 interface PayButtonProps {
-  therapistWallet: string;
+  therapistWallet: string | null | undefined;
   amountTon: number;
   label: string;
   onSuccess: (boc: string) => void;
@@ -38,6 +38,8 @@ export function PayButton({
       tonConnectUI.openModal();
       return;
     }
+
+    if (!therapistWallet) return;
 
     setLoading(true);
 
@@ -76,7 +78,7 @@ export function PayButton({
       size="l"
       stretched
       loading={loading}
-      disabled={disabled || loading}
+      disabled={disabled || loading || !therapistWallet}
       onClick={handlePay}
     >
       {wallet ? label : "Connect Wallet to Pay"}
