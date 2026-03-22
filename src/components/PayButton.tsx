@@ -71,7 +71,7 @@ export function PayButton({
 
     try {
       const tx = buildPayTransaction(therapistWallet, amountTon);
-      console.log("[PayButton] sending transaction", tx);
+      console.log("[SEND TXXX] sending transaction", tx);
       const result = await tonConnectUI.sendTransaction(tx);
       console.log("[PayButton] transaction result", result);
       try {
@@ -79,6 +79,7 @@ export function PayButton({
       } catch {}
       onSuccess(result.boc);
     } catch (err) {
+      console.log("failed shit", therapistWallet);
       const message = err instanceof Error ? err.message : String(err);
       const cancelled =
         message.includes("Transaction was not sent") ||

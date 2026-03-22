@@ -13,6 +13,7 @@ import {
   useLaunchParams,
   useSignal,
 } from "@tma.js/sdk-react";
+import { toUserFriendlyAddress } from "@tonconnect/sdk";
 import { TonConnectUIProvider, useTonWallet } from "@tonconnect/ui-react";
 import { type PropsWithChildren, useEffect, useRef } from "react";
 
@@ -50,7 +51,8 @@ function AuthInit({ role }: { role: Role }) {
 
 function WalletSync() {
   const wallet = useTonWallet();
-  const address = wallet?.account?.address ?? null;
+  const rawAddress = wallet?.account?.address ?? null;
+  const address = rawAddress ? toUserFriendlyAddress(rawAddress) : null;
   const setWalletAddress = useAuthStore((s) => s.setWalletAddress);
   const token = useAuthStore((s) => s.supabaseToken);
   const userId = useAuthStore((s) => s.telegramUser?.id);
@@ -69,9 +71,12 @@ function WalletSync() {
       .from("users")
       .update({ wallet_address: address })
       .eq("id", userId)
-      .then(({ error }) => {
+      .select()
+      .then(({ data, error }) => {
         if (error)
           console.error("[WalletSync] failed to persist wallet", error);
+        else if (!data || data.length === 0)
+          console.error("[WalletSync] wallet update matched 0 rows — check RLS policy on users table. userId:", userId);
         else console.log("[WalletSync] wallet persisted", address);
       });
   }, [address, token, userId]);

@@ -51,6 +51,8 @@ export function BookingDrawer({
     ? (slots.find((s) => s.id === selected.slotId) ?? null)
     : null;
 
+  console.log("receiver walletAddress from drawer: ", walletAddress);
+
   async function handlePaymentSuccess(boc: string) {
     if (!selectedSlot || !selected) return;
     await bookAndPay.mutateAsync({
@@ -122,8 +124,12 @@ export function BookingDrawer({
                             : "var(--foreground)",
                         }}
                       >
-                        <span className="font-medium">{item.label.split(" · ")[0]}</span>
-                        <span className="font-normal text-muted-foreground">{item.label.split(" · ")[1]}</span>
+                        <span className="font-medium">
+                          {item.label.split(" · ")[0]}
+                        </span>
+                        <span className="text-muted-foreground font-normal">
+                          {item.label.split(" · ")[1]}
+                        </span>
                       </button>
                     );
                   })}

@@ -6,6 +6,8 @@ export function buildPayTransaction(
 ): SendTransactionRequest {
   const nanotons = Math.round(amountTon * 1e9).toString();
 
+  console.log("recipientWallet: ", recipientWallet);
+
   return {
     validUntil: Math.floor(Date.now() / 1000) + 600,
     messages: [
