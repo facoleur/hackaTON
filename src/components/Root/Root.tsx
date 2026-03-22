@@ -29,7 +29,7 @@ function RootInner({ children }: PropsWithChildren) {
   }, [initDataUser]);
 
   return (
-    <TonConnectUIProvider manifestUrl="https://hacka-ton-dun.vercel.app/tonconnect-manifest.json">
+    <TonConnectUIProvider manifestUrl={process.env.NEXT_PUBLIC_TONCONNECT_MANIFEST_URL!}>
       <AppRoot
         appearance={isDark ? 'dark' : 'light'}
         platform={

@@ -121,19 +121,16 @@ export function Providers({ children, role }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <TonConnectUIProvider
-        manifestUrl={`https://hacka-ton-dun.vercel.app/tonconnect-manifest.json`}
+        manifestUrl={process.env.NEXT_PUBLIC_TONCONNECT_MANIFEST_URL!}
         actionsConfiguration={{
-          twaReturnUrl:
-            role === 'client'
-              ? `https://t.me/canette_marketplace_bot/canette`
-              : `https://t.me/canette_therapist_bot/canettepro`,
+          twaReturnUrl: (
+            role === "client"
+              ? process.env.NEXT_PUBLIC_CLIENT_TWA_URL!
+              : process.env.NEXT_PUBLIC_THERAPIST_TWA_URL!
+          ) as `${string}://${string}`,
         }}
       >
-        {didMount ? (
-          <AppInner role={role}>{children}</AppInner>
-        ) : (
-          <AppLoader />
-        )}
+        {didMount ? <AppInner role={role}>{children}</AppInner> : <AppLoader />}
       </TonConnectUIProvider>
     </QueryClientProvider>
   );

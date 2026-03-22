@@ -52,7 +52,7 @@ Mirrors the `TherapistCard` layout: image area + text lines.
 export function TherapistCardSkeleton() {
   return (
     <div className="rounded-xl overflow-hidden">
-      <Skeleton className="aspect-[3/4] w-full" />
+      <Skeleton className="aspect-3/4 w-full" />
       <div className="p-2 space-y-2">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-3 w-1/2" />
