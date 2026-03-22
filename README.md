@@ -8,6 +8,10 @@ Turn every Telegram profile into a bookable, paid service powered by TON.
 
 Launch the marketplace here: https://t.me/canette_marketplace_bot
 
+## Demo
+
+See [./docs/demo.mp4](./docs/demo.mp4)
+
 ### Overview
 
 **Canet** transforms Telegram into a native service marketplace by combining scheduling and on-chain payments. Service providers can publish availability, and clients can instantly book and pay without leaving the chat environment.
