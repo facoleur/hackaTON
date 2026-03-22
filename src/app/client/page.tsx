@@ -2,13 +2,15 @@
 
 import { TherapistCard } from "@/components/TherapistCard";
 import { useTherapists } from "@/hooks/useTherapists";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
 
 export default function BrowsePage() {
   const router = useRouter();
+  const token = useAuthStore((s) => s.supabaseToken);
   const { data: therapists, isLoading, error } = useTherapists();
 
-  if (isLoading) {
+  if (!token || isLoading) {
     return (
       <div className="flex justify-center p-10">
         <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />

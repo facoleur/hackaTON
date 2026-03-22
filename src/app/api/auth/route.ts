@@ -21,8 +21,13 @@ export async function POST(req: NextRequest) {
 
     const botToken =
       role === 'client'
-        ? process.env.TELEGRAM_BOT_TOKEN_CLIENT!
-        : process.env.TELEGRAM_BOT_TOKEN_THERAPIST!;
+        ? process.env.TELEGRAM_BOT_TOKEN_CLIENT
+        : process.env.TELEGRAM_BOT_TOKEN_THERAPIST;
+
+    if (!botToken) {
+      console.error(`Missing env var for role: ${role}`);
+      return NextResponse.json({ error: `Bot token not configured for role: ${role}` }, { status: 500 });
+    }
 
     // Validate signature (skip in development for local testing)
     if (process.env.NODE_ENV !== 'development') {
