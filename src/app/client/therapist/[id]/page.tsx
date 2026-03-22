@@ -192,7 +192,6 @@ export default function TherapistDetailPage({ params }: Props) {
         <div className="safe-botton-zone fixed right-4 bottom-4 z-30">
           <Button
             size="lg"
-            className="h-12 w-full rounded-2xl px-6 text-base font-semibold shadow-lg"
             onClick={() => {
               try {
                 hapticFeedback.impactOccurred("light");

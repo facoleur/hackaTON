@@ -34,24 +34,11 @@ await upsert.mutateAsync({
 
 The profile page and `TherapistPhotoManager` use the hook. If a therapist uploads photos during onboarding and then tries to manage them via the profile page, the hook looks in the wrong bucket — deletes fail, new uploads go to the wrong place.
 
-**Decision:** Standardize on `"therapist-photos"` (used at onboarding, which is the source of truth for initial data).
+**Decision:** Standardize on `"canettes"` (the bucket used by `useTherapistPhotos` and all post-onboarding photo management).
 
-**File:** `src/hooks/useTherapistPhotos.ts`
+**File:** `src/app/therapist/onboarding/OnboardingFlow.tsx` ✅ done
 
-**Change:** Replace the bucket constant and the URL marker:
-
-```ts
-// Before
-const BUCKET = 'canettes';
-// ...
-const marker = `/public/${BUCKET}/`;
-
-// After
-const BUCKET = 'therapist-photos';
-// storagePath() already uses the BUCKET constant — no other change needed
-```
-
-Also ensure the `"therapist-photos"` bucket exists in Supabase Storage and has a public read policy.
+**Change:** Replace `"therapist-photos"` with `"canettes"` in both the `upload` and `getPublicUrl` calls in `PhotosStep.handleFinish()`.
 
 ---
 
@@ -205,14 +192,14 @@ Ensure the profile edit form preserves `is_active: true` when saving (it shouldn
 
 ## Execution Order
 
-| # | Task | File(s) | Effort |
+| # | Task | File(s) | Status |
 |---|------|---------|--------|
-| 1 | Add `is_active: true` to onboarding upsert | `OnboardingFlow.tsx` | 1 line |
-| 2 | Fix photo bucket to `"therapist-photos"` | `useTherapistPhotos.ts` | 1 line |
-| 3a | Redirect to availability after onboarding | `TherapistShell.tsx` | 3 lines |
-| 3b | Dashboard banner when no availability slots | `therapist/page.tsx` | ~15 lines |
-| 4 | Verify RLS policy on `users.wallet_address` | Supabase dashboard | no code |
-| 5 | Verify/add FK `therapist_profiles.user_id → users.id` | Supabase dashboard / migration | SQL if needed |
-| 6 | Decouple rating from final payment gate | `pay/[bookingId]/page.tsx` | 2 lines |
-| 7 | Remove `onboardingDone` state from gate | `TherapistShell.tsx` | ~5 lines |
-| 8 | Audit profile edit for `is_active` preservation | `useProfileForm.ts` | verify only |
+| 1 | Add `is_active: true` to onboarding upsert | `OnboardingFlow.tsx` | ✅ done |
+| 2 | Fix photo bucket to `"canettes"` | `OnboardingFlow.tsx` | ✅ done |
+| 3a | Redirect to availability after onboarding | `TherapistShell.tsx` | ✅ done |
+| 3b | Dashboard banner when no availability slots | `therapist/page.tsx` | ✅ done |
+| 4 | Verify RLS policy on `users.wallet_address` | Supabase dashboard | ⚠️ manual check |
+| 5 | Verify/add FK `therapist_profiles.user_id → users.id` | Supabase dashboard / migration | ⚠️ manual check |
+| 6 | Decouple rating from final payment gate | `pay/[bookingId]/page.tsx` | ✅ done |
+| 7 | Remove `onboardingDone` state from gate | `TherapistShell.tsx` | ✅ done |
+| 8 | Audit profile edit for `is_active` preservation | `useProfileForm.ts` | ✅ already correct |

@@ -1,7 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { buildPayTransaction } from "@/lib/ton";
-import { Button } from "@telegram-apps/telegram-ui";
 import {
   closingBehavior,
   hapticFeedback,
@@ -79,10 +79,16 @@ export function PayButton({
       } catch {}
       onSuccess(result.boc);
     } catch (err) {
-      console.error("[PayButton] payment failed", err);
-      try {
-        hapticFeedback.notificationOccurred("error");
-      } catch {}
+      const message = err instanceof Error ? err.message : String(err);
+      const cancelled =
+        message.includes("Transaction was not sent") ||
+        message.includes("Reject request");
+      if (!cancelled) {
+        console.error("[PayButton] payment failed", err);
+        try {
+          hapticFeedback.notificationOccurred("error");
+        } catch {}
+      }
     } finally {
       setLoading(false);
       try {
@@ -96,7 +102,7 @@ export function PayButton({
 
   return (
     <Button
-      size="l"
+      size={"lg"}
       stretched
       loading={loading}
       disabled={disabled || loading || !therapistWallet}

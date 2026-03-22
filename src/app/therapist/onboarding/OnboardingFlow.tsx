@@ -132,6 +132,7 @@ function InfoStep({ onNext }: { onNext: () => void }) {
       location_name: values.location_name || null,
       price_ton: parseFloat(values.price_ton) || 0.5,
       photos: [],
+      is_active: true,
     });
     try {
       hapticFeedback.notificationOccurred("success");
@@ -243,11 +244,11 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
         const ext = file.name.split(".").pop() ?? "jpg";
         const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const { error: uploadError } = await supabase.storage
-          .from("therapist-photos")
+          .from("canettes")
           .upload(path, file);
         if (uploadError) throw uploadError;
         const { data } = supabase.storage
-          .from("therapist-photos")
+          .from("canettes")
           .getPublicUrl(path);
         urls.push(data.publicUrl);
       }

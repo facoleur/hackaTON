@@ -8,7 +8,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { TonConnectButton } from "@tonconnect/ui-react";
 import { backButton } from "@tma.js/sdk-react";
 import { usePathname, useRouter } from "next/navigation";
-import { type PropsWithChildren, useEffect, useState } from "react";
+import { type PropsWithChildren, useEffect } from "react";
 
 const tabs = [
   { path: "/therapist", label: "Dashboard", icon: "📅" },
@@ -47,12 +47,16 @@ function TherapistHeader() {
 function OnboardingGate({ children }: PropsWithChildren) {
   const token = useAuthStore((s) => s.supabaseToken);
   const { data: profile, isLoading } = useMyProfile();
-  const [onboardingDone, setOnboardingDone] = useState(false);
+  const router = useRouter();
 
   if (!token || isLoading) return <Spinner />;
 
-  if (!onboardingDone && profile === null) {
-    return <OnboardingFlow onDone={() => setOnboardingDone(true)} />;
+  if (profile === null) {
+    return (
+      <OnboardingFlow
+        onDone={() => router.push("/therapist/availability")}
+      />
+    );
   }
 
   return <>{children}</>;

@@ -10,6 +10,7 @@ export const queryKeys = {
     byUser: (userId: string) => ['bookings', 'user', userId] as const,
     detail: (id: string) => ['bookings', 'detail', id] as const,
     therapistRequests: (therapistId: string) => ['bookings', 'therapist', therapistId] as const,
+    bookedDates: (therapistId: string) => ['bookings', 'bookedDates', therapistId] as const,
   },
   profile: {
     byUser: (userId: string) => ['profile', 'user', userId] as const,

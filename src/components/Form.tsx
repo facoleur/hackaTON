@@ -6,13 +6,7 @@ type AnyFieldError =
   | Merge<FieldError, FieldErrorsImpl<unknown>>
   | undefined;
 
-function FormSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function FormSection({ children }: { children: React.ReactNode }) {
   return (
     <div className="bg-card space-y-2 rounded-xl p-2">
       <div className="rounded-xl">{children}</div>

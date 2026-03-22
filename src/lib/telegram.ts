@@ -30,6 +30,7 @@ export function validateInitData(
     .digest('hex');
 
   if (expectedHash !== hash) {
+    console.error('[telegram] hash mismatch | expected:', expectedHash.slice(0, 10), '| got:', hash?.slice(0, 10));
     throw new Error('Invalid initData signature');
   }
 

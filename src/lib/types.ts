@@ -27,6 +27,7 @@ export interface TherapistProfile {
   bio: string | null;
   price_ton: number;
   duration_minutes: number;
+  max_multiplier: number;
   upfront_percent: number;
   location_name: string | null;
   location_lat: number | null;

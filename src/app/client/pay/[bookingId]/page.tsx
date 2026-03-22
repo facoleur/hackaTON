@@ -125,7 +125,6 @@ export default function PayPage({ params }: Props) {
 
       {/* Final payment */}
       {booking.status === "completed" &&
-        hasRating &&
         booking.upfront_percent < 100 && (
           <div>
             <p className="text-muted-foreground mb-1 px-4 text-xs font-medium tracking-wide">

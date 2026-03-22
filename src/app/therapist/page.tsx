@@ -3,7 +3,27 @@
 import { useTherapistDashboard } from "@/app/therapist/hooks/useTherapistDashboard";
 import { BookingStatusBadge } from "@/components/BookingStatusBadge";
 import { Button } from "@/components/ui/button";
+import { useAvailability } from "@/hooks/useAvailability";
+import { formatTime } from "@/lib/date";
 import { formatTon } from "@/lib/ton";
+import { useRouter } from "next/navigation";
+
+function NoAvailabilityBanner({ onPress }: { onPress: () => void }) {
+  return (
+    <div className="mx-4 mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+      <p className="text-sm font-medium text-amber-900">No availability set</p>
+      <p className="mt-0.5 text-xs text-amber-700">
+        Clients can&apos;t book you until you add schedule slots.
+      </p>
+      <button
+        onClick={onPress}
+        className="mt-2 text-xs font-medium text-amber-900 underline"
+      >
+        Set availability →
+      </button>
+    </div>
+  );
+}
 
 function EmptyDashboard() {
   return (
@@ -93,6 +113,8 @@ export default function TherapistDashboard() {
     isRejecting,
     isCompleting,
   } = useTherapistDashboard();
+  const { data: slots } = useAvailability(profile?.id ?? "");
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -104,10 +126,18 @@ export default function TherapistDashboard() {
 
   if (!profile) return <NoProfileState />;
 
-  if (!bookings?.length) return <EmptyDashboard />;
+  const noSlots = slots !== undefined && slots.length === 0;
+
+  if (!bookings?.length) return (
+    <>
+      {noSlots && <NoAvailabilityBanner onPress={() => router.push("/therapist/availability")} />}
+      <EmptyDashboard />
+    </>
+  );
 
   return (
     <div className="space-y-4 py-4">
+      {noSlots && <NoAvailabilityBanner onPress={() => router.push("/therapist/availability")} />}
       {/* Pending requests */}
       {pending.length > 0 && (
         <div>
@@ -121,7 +151,7 @@ export default function TherapistDashboard() {
                   {b.users?.first_name ?? "Client"}
                 </p>
                 <p className="text-muted-foreground mt-0.5 text-xs">
-                  {b.booking_date} · {b.start_time} · {b.duration_minutes} min
+                  {b.booking_date} · {formatTime(b.start_time)} · {b.duration_minutes} min
                 </p>
                 <p className="text-muted-foreground text-xs">
                   {formatTon(b.amount_ton)}
@@ -162,7 +192,7 @@ export default function TherapistDashboard() {
                   {b.users?.first_name ?? "Client"}
                 </p>
                 <p className="text-muted-foreground mt-0.5 text-xs">
-                  {b.booking_date} · {b.start_time}
+                  {b.booking_date} · {formatTime(b.start_time)}
                 </p>
                 <div className="mt-1">
                   <BookingStatusBadge status={b.status} />

@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
 
     // Validate signature (skip in development for local testing)
     if (process.env.NODE_ENV !== 'development') {
+      console.log('[auth] role:', role, '| token prefix:', botToken.slice(0, 8), '| initData length:', initData.length);
       validateInitData(initData, botToken);
     }
 

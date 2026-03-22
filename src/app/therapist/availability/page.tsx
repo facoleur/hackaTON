@@ -1,7 +1,10 @@
 "use client";
 
+import { AvailabilitySlotList } from "@/components/AvailabilitySlotList";
+import { FormField, FormSection } from "@/components/Form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   useAddAvailability,
   useAvailability,
@@ -25,43 +28,75 @@ const DAY_NAMES = [
 export default function AvailabilityPage() {
   const { data: profile, isLoading: profileLoading } = useMyProfile();
   const { data: slots, isLoading: slotsLoading } = useAvailability(
-    profile?.id ?? ""
+    profile?.id ?? "",
   );
   const addSlot = useAddAvailability(profile?.id ?? "");
   const deleteSlot = useDeleteAvailability(profile?.id ?? "");
 
-  const [selectedDay, setSelectedDay] = useState(1);
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("17:00");
+  const [selectedDays, setSelectedDays] = useState<Set<number>>(new Set());
+  const [sameHours, setSameHours] = useState(true);
+  const [sharedStart, setSharedStart] = useState("09:00");
+  const [sharedEnd, setSharedEnd] = useState("17:00");
+  const [perDayTimes, setPerDayTimes] = useState<
+    Record<number, { start: string; end: string }>
+  >({});
 
   if (profileLoading || slotsLoading) {
     return (
       <div className="flex justify-center p-10">
-        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
-        <p className="font-medium text-foreground">Profile required</p>
-        <p className="text-sm text-muted-foreground mt-1">
+      <div className="flex flex-col items-center justify-center px-8 py-16 text-center">
+        <p className="text-foreground font-medium">Profile required</p>
+        <p className="text-muted-foreground mt-1 text-sm">
           Create your profile first before setting availability.
         </p>
       </div>
     );
   }
 
+  function toggleDay(day: number) {
+    setSelectedDays((prev) => {
+      const next = new Set(prev);
+      if (next.has(day)) {
+        next.delete(day);
+      } else {
+        next.add(day);
+        if (!perDayTimes[day]) {
+          setPerDayTimes((t) => ({
+            ...t,
+            [day]: { start: sharedStart, end: sharedEnd },
+          }));
+        }
+      }
+      return next;
+    });
+  }
+
   async function handleAdd() {
+    if (selectedDays.size === 0) return;
     try {
       hapticFeedback.impactOccurred("light");
     } catch {}
-    await addSlot.mutateAsync({
-      day_of_week: selectedDay,
-      start_time: startTime,
-      end_time: endTime,
-    });
+
+    for (const day of Array.from(selectedDays).sort()) {
+      const start = sameHours
+        ? sharedStart
+        : (perDayTimes[day]?.start ?? sharedStart);
+      const end = sameHours ? sharedEnd : (perDayTimes[day]?.end ?? sharedEnd);
+      await addSlot.mutateAsync({
+        day_of_week: day,
+        start_time: start,
+        end_time: end,
+      });
+    }
+
+    setSelectedDays(new Set());
     try {
       hapticFeedback.notificationOccurred("success");
     } catch {}
@@ -74,110 +109,118 @@ export default function AvailabilityPage() {
     await deleteSlot.mutateAsync(id);
   }
 
-  const byDay = DAY_NAMES.map((name, day) => ({
-    day,
-    name,
-    slots: slots?.filter((s) => s.day_of_week === day) ?? [],
-  })).filter((d) => d.slots.length > 0);
-
   return (
-    <div className="space-y-4 py-4">
-      {/* Add Time Slot */}
-      <div>
-        <p className="px-4 text-xs font-medium text-muted-foreground   tracking-wide mb-1">
-          Add Time Slot
-        </p>
-        <div className="bg-card rounded-xl overflow-hidden divide-y divide-border mx-4">
-          <div className="px-4 py-3">
-            <div className="flex gap-2 flex-wrap">
-              {DAY_NAMES.map((name, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedDay(i)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-[13px] cursor-pointer min-w-[44px] min-h-[44px] border transition-colors",
-                    selectedDay === i
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-transparent text-primary border-primary hover:bg-primary/10"
-                  )}
-                >
-                  {name.slice(0, 3)}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="px-4 py-3">
-            <label className="block text-xs font-medium text-muted-foreground mb-1">
-              Start time
-            </label>
-            <Input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-          </div>
-          <div className="px-4 py-3">
-            <label className="block text-xs font-medium text-muted-foreground mb-1">
-              End time
-            </label>
-            <Input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
-          </div>
-          <div className="px-4 pt-3 pb-4">
-            <Button
-              size="lg"
-              className="w-full"
-              loading={addSlot.isPending}
-              disabled={addSlot.isPending}
-              onClick={handleAdd}
+    <div className="space-y-4 px-4 py-4">
+      {/* Day toggles */}
+      <FormSection>
+        <div className="flex flex-wrap gap-1">
+          {DAY_NAMES.map((name, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => toggleDay(i)}
+              className={cn(
+                "border-primary/30! min-h-11 min-w-11 flex-1 cursor-pointer rounded-md border px-4 py-1.5 text-sm",
+                selectedDays.has(i)
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "text-primary border-primary hover:bg-primary/10 bg-transparent",
+              )}
             >
-              Add Slot
-            </Button>
-          </div>
+              {name.slice(0, 3)}
+            </button>
+          ))}
         </div>
-      </div>
+      </FormSection>
 
-      {/* Existing slots by day */}
-      {byDay.length > 0 ? (
-        byDay.map(({ day, name, slots: daySlots }) => (
-          <div key={day}>
-            <p className="px-4 text-xs font-medium text-muted-foreground   tracking-wide mb-1">
-              {name}
-            </p>
-            <div className="bg-card rounded-xl overflow-hidden divide-y divide-border mx-4">
-              {daySlots.map((slot) => (
-                <div
-                  key={slot.id}
-                  className="flex items-center justify-between px-4 py-3"
-                >
-                  <span className="text-sm text-foreground">
-                    {slot.start_time} – {slot.end_time}
-                  </span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDelete(slot.id)}
-                    loading={deleteSlot.isPending}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
-            </div>
+      {/* Hours form */}
+      <FormSection>
+        <FormField label="Same hours for all days">
+          <div className="flex justify-end">
+            <Switch checked={sameHours} onCheckedChange={setSameHours} />
           </div>
-        ))
-      ) : (
-        <div className="flex flex-col items-center justify-center py-10 px-8 text-center">
-          <p className="font-medium text-foreground">No slots set</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Add your weekly availability above.
+        </FormField>
+      </FormSection>
+      <FormSection>
+        {sameHours && (
+          <>
+            <FormField label="Start time">
+              <Input
+                type="time"
+                value={sharedStart}
+                onChange={(e) => setSharedStart(e.target.value)}
+              />
+            </FormField>
+            <FormField label="End time">
+              <Input
+                type="time"
+                value={sharedEnd}
+                onChange={(e) => setSharedEnd(e.target.value)}
+              />
+            </FormField>
+          </>
+        )}
+
+        {!sameHours && selectedDays.size === 0 && (
+          <p className="text-muted-foreground py-2 text-center text-sm">
+            Select days above to set their hours.
           </p>
-        </div>
-      )}
+        )}
+
+        {!sameHours &&
+          Array.from(selectedDays)
+            .sort()
+            .map((day) => (
+              <div key={day}>
+                <p className="text-muted-foreground pt-2 pb-1 text-xs font-semibold">
+                  {DAY_NAMES[day]}
+                </p>
+                <div>
+                  <FormField label="Start">
+                    <Input
+                      type="time"
+                      value={perDayTimes[day]?.start ?? sharedStart}
+                      onChange={(e) =>
+                        setPerDayTimes((t) => ({
+                          ...t,
+                          [day]: { ...t[day], start: e.target.value },
+                        }))
+                      }
+                    />
+                  </FormField>
+                  <FormField label="End">
+                    <Input
+                      type="time"
+                      value={perDayTimes[day]?.end ?? sharedEnd}
+                      onChange={(e) =>
+                        setPerDayTimes((t) => ({
+                          ...t,
+                          [day]: { ...t[day], end: e.target.value },
+                        }))
+                      }
+                    />
+                  </FormField>
+                </div>
+              </div>
+            ))}
+      </FormSection>
+
+      <Button
+        size="lg"
+        className="w-full"
+        loading={addSlot.isPending}
+        disabled={addSlot.isPending || selectedDays.size === 0}
+        onClick={handleAdd}
+      >
+        {selectedDays.size > 1
+          ? `Add Slots (${selectedDays.size} days)`
+          : "Add Slot"}
+      </Button>
+
+      <AvailabilitySlotList
+        slots={slots ?? []}
+        isDeleting={deleteSlot.isPending}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }

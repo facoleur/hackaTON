@@ -144,7 +144,7 @@ export function PhotoManager({ photos }: Props) {
 import { PhotoManager } from '@/components/PhotoManager';
 
 // Inside the form JSX, after loading profile:
-<FormSection title="Photos">
+<FormSection >
   <PhotoManager photos={profile?.photos ?? []} />
 </FormSection>
 ```

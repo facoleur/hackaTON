@@ -1,14 +1,16 @@
 "use client";
 
 import { BookingSuccessCard } from "@/components/BookingSuccessCard";
+import { DurationPicker } from "@/components/DurationPicker";
 import { PayButton } from "@/components/PayButton";
 import { useBookAndPay } from "@/hooks/useBookAndPay";
-import { DAY_NAMES, formatTime } from "@/lib/date";
+import { useTherapistBookedDates } from "@/hooks/useTherapistBookedDates";
+import { expandSlots, type DatedSlot } from "@/lib/date";
 import { formatTon } from "@/lib/ton";
 import type { Availability, TherapistProfile } from "@/lib/types";
 import { hapticFeedback } from "@tma.js/sdk-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface Props {
   therapist: TherapistProfile;
@@ -27,26 +29,35 @@ export function BookingDrawer({
 }: Props) {
   const router = useRouter();
   const bookAndPay = useBookAndPay();
+  const bookedSet = useTherapistBookedDates(therapist.id);
 
-  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
-  const [bookingDate, setBookingDate] = useState("");
+  const [selected, setSelected] = useState<{ slotId: string; date: string } | null>(null);
   const [step, setStep] = useState<"form" | "success">("form");
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [multiplier, setMultiplier] = useState(1);
 
-  const upfrontAmount = (therapist.price_ton * therapist.upfront_percent) / 100;
-  const remainingAmount = therapist.price_ton - upfrontAmount;
+  const duration = therapist.duration_minutes * multiplier;
+  const totalPrice = therapist.price_ton * multiplier;
+  const upfrontAmount = (totalPrice * therapist.upfront_percent) / 100;
+  const remainingAmount = totalPrice - upfrontAmount;
 
-  const selectedSlot = slots.find((s) => s.id === selectedSlotId) ?? null;
-  const canPay = !!selectedSlot && !!bookingDate;
+  const datedSlots = useMemo(
+    () => expandSlots(slots, bookedSet, duration),
+    [slots, bookedSet, duration],
+  );
+
+  const selectedSlot = selected
+    ? slots.find((s) => s.id === selected.slotId) ?? null
+    : null;
 
   async function handlePaymentSuccess(boc: string) {
-    if (!selectedSlot || !bookingDate) return;
+    if (!selectedSlot || !selected) return;
     await bookAndPay.mutateAsync({
       therapist_id: therapist.id,
-      booking_date: bookingDate,
+      booking_date: selected.date,
       start_time: selectedSlot.start_time,
-      duration_minutes: therapist.duration_minutes,
-      amount_ton: therapist.price_ton,
+      duration_minutes: duration,
+      amount_ton: totalPrice,
       upfront_percent: therapist.upfront_percent,
       upfront_amount: upfrontAmount,
       remaining_amount: remainingAmount,
@@ -78,37 +89,26 @@ export function BookingDrawer({
               Book a session
             </h2>
 
-            <div className="mb-4">
-              <label className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wider">
-                Date
-              </label>
-              <input
-                type="date"
-                value={bookingDate}
-                onChange={(e) => setBookingDate(e.target.value)}
-                min={new Date().toISOString().split("T")[0]}
-                className="border-border bg-card text-foreground focus:ring-primary/40 w-full appearance-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
-              />
-            </div>
-
-            {slots.length > 0 && (
+            {datedSlots.length > 0 ? (
               <div className="mb-6">
                 <label className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wider">
-                  Time slot
+                  Available slots
                 </label>
-                <div className="flex flex-col gap-2">
-                  {slots.map((slot) => {
-                    const active = selectedSlotId === slot.id;
+                <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">
+                  {datedSlots.map((item: DatedSlot) => {
+                    const active =
+                      selected?.slotId === item.slot.id &&
+                      selected?.date === item.date;
                     return (
                       <button
-                        key={slot.id}
+                        key={`${item.slot.id}-${item.date}`}
                         onClick={() => {
                           try {
                             hapticFeedback.impactOccurred("light");
                           } catch {}
-                          setSelectedSlotId(slot.id);
+                          setSelected({ slotId: item.slot.id, date: item.date });
                         }}
-                        className="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors"
+                        className="flex w-full items-center rounded-xl border px-4 py-3 text-sm transition-colors"
                         style={{
                           borderColor: active
                             ? "var(--primary)"
@@ -122,24 +122,33 @@ export function BookingDrawer({
                           fontWeight: active ? 600 : 400,
                         }}
                       >
-                        <span>{DAY_NAMES[slot.day_of_week]}</span>
-                        <span>
-                          {formatTime(slot.start_time)} –{" "}
-                          {formatTime(slot.end_time)}
-                        </span>
+                        {item.label}
                       </button>
                     );
                   })}
                 </div>
               </div>
+            ) : (
+              <p className="text-muted-foreground mb-6 text-sm">
+                No available slots in the next 30 days.
+              </p>
             )}
+
+            <div className="mb-6">
+              <DurationPicker
+                base={therapist.duration_minutes}
+                max={therapist.max_multiplier ?? 3}
+                value={multiplier}
+                onChange={(m) => { setMultiplier(m); setSelected(null); }}
+              />
+            </div>
 
             <PayButton
               therapistWallet={walletAddress}
               amountTon={upfrontAmount}
               label={`Pay ${formatTon(upfrontAmount)} now`}
               onSuccess={handlePaymentSuccess}
-              disabled={!canPay}
+              disabled={!selected}
             />
           </>
         )}

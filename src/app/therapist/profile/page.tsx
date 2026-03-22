@@ -56,12 +56,12 @@ export default function ProfilePage() {
         </FormField>
       </FormSection>
 
-      <FormSection title="Wallet">
+      <FormSection >
         <FormField label="TON address">
           {walletAddress ? (
             <div className="bg-muted flex items-center justify-between gap-2 rounded-lg px-3 py-2">
               <span className="font-mono text-sm font-medium">
-                {Address.parse(walletAddress).toString({ urlSafe: true, bounceable: false })}
+                {(() => { const a = Address.parse(walletAddress).toString({ urlSafe: true, bounceable: false }); return `${a.slice(0, 6)}...${a.slice(-6)}`; })()}
               </span>
               <span className="text-muted-foreground text-xs">Connected</span>
             </div>
@@ -95,6 +95,14 @@ export default function ProfilePage() {
             {...register("duration_minutes")}
           />
         </FormField>
+        <FormField label="Max sessions">
+          <Input
+            type="number"
+            inputMode="numeric"
+            placeholder="3"
+            {...register("max_multiplier")}
+          />
+        </FormField>
         <FormField label="Upfront % (10–100)" error={errors.upfront_percent}>
           <Input
             type="number"
@@ -105,7 +113,7 @@ export default function ProfilePage() {
         </FormField>
       </FormSection>
 
-      <FormSection title="Visibility">
+      <FormSection >
         <div className="flex items-center justify-between py-1">
           <span className="text-foreground text-sm font-medium">
             Active (visible to clients)
