@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     const txHash = event === 'upfront' ? booking.tx_hash_upfront : booking.tx_hash;
     const amount = booking.amount_ton;
 
-    const token = process.env.TELEGRAM_BOT_TOKEN!;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN!;
 
     const clientMsg = event === 'upfront'
       ? `✅ Payment confirmed!\n\nYou paid ${amount} TON for your session with ${therapistName}.\n\n📅 ${date} at ${time}\n🔗 TX: ${txHash}`
@@ -64,10 +64,10 @@ export async function POST(req: NextRequest) {
 
     await Promise.allSettled([
       clientTelegramId
-        ? sendTelegramMessage(token, clientTelegramId, clientMsg)
+        ? sendTelegramMessage(botToken, clientTelegramId, clientMsg)
         : Promise.resolve(),
       therapistTelegramId
-        ? sendTelegramMessage(token, therapistTelegramId, therapistMsg)
+        ? sendTelegramMessage(botToken, therapistTelegramId, therapistMsg)
         : Promise.resolve(),
     ]);
 
