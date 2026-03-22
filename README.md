@@ -6,7 +6,9 @@ Canet is a Telegram Mini App that enables anyone to offer services through bofok
 
 Turn every Telegram profile into a bookable, paid service powered by TON.
 
-### Overviefw
+Launch the marketplace here: https://t.me/canette_marketplace_bot
+
+### Overview
 
 Canetf transforms Telegram into a native service marketplace by combining scheduling and on-chain payments. Service providers can publish availability, and clients can instantly book and pay without leaving the chat environment.
 
